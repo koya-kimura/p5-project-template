@@ -2,18 +2,15 @@ import p5 from "p5";
 import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager"; // MIDIコントローラー管理クラス
 import type { AudioMicManager } from "../utils/audio/audioMicManager"; // オーディオ入力管理クラス
 import type { CaptureManager } from "../utils/capture/captureManager"; // カメラキャプチャ管理クラス
-import { DebugScreen } from "../visuals/debugScreen"; // デバッグ画面描画クラス
 
 /**
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
  */
 export class VisualComposer {
   private renderTexture: p5.Graphics | undefined; // ビジュアル描画用のオフスクリーンキャンバス
-  private debugScreen: DebugScreen; // デバッグ画面インスタンス
 
   constructor() {
     this.renderTexture = undefined;
-    this.debugScreen = new DebugScreen();
   }
 
   /**
