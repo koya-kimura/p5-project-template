@@ -10,13 +10,13 @@ export type NumericRange = { min: number; max: number };
  * @returns 0.0 以上 1.0 以下の数値。
  */
 export function clampUnitRange(value: number): number {
-    if (value < 0) {
-        return 0;
-    }
-    if (value > 1) {
-        return 1;
-    }
-    return value;
+  if (value < 0) {
+    return 0;
+  }
+  if (value > 1) {
+    return 1;
+  }
+  return value;
 }
 
 /**
@@ -31,14 +31,14 @@ export function clampUnitRange(value: number): number {
  * @returns 0 以上 Math.min(7, maxOptions - 1) 以下の整数。
  */
 export function clampGridSelection(value: number, maxOptions: number): number {
-    const maxIndex = Math.max(0, Math.min(7, maxOptions - 1));
-    if (value < 0) {
-        return 0;
-    }
-    if (value > maxIndex) {
-        return maxIndex;
-    }
-    return value;
+  const maxIndex = Math.max(0, Math.min(7, maxOptions - 1));
+  if (value < 0) {
+    return 0;
+  }
+  if (value > maxIndex) {
+    return maxIndex;
+  }
+  return value;
 }
 
 /**
@@ -51,8 +51,8 @@ export function clampGridSelection(value: number, maxOptions: number): number {
  * @returns 0.0 以上 1.0 未満の疑似乱数。
  */
 export function pseudoRandomFromSeed(seed: number): number {
-    const x = Math.sin(seed * 99999 + 1) * 10000;
-    return x - Math.floor(x);
+  const x = Math.sin(seed * 99999 + 1) * 10000;
+  return x - Math.floor(x);
 }
 
 /**
@@ -65,10 +65,10 @@ export function pseudoRandomFromSeed(seed: number): number {
  * @returns min 以上 max 未満のランダムな数値。
  */
 export function randomDurationInRange(range: NumericRange): number {
-    if (range.min >= range.max) {
-        return range.min;
-    }
-    return range.min + Math.random() * (range.max - range.min);
+  if (range.min >= range.max) {
+    return range.min;
+  }
+  return range.min + Math.random() * (range.max - range.min);
 }
 
 /**
@@ -81,8 +81,8 @@ export function randomDurationInRange(range: NumericRange): number {
  * @returns 現在のタイムスタンプ（ミリ秒）。
  */
 export function getCurrentTimestamp(): number {
-    if (typeof performance !== "undefined" && typeof performance.now === "function") {
-        return performance.now();
-    }
-    return Date.now();
+  if (typeof performance !== "undefined" && typeof performance.now === "function") {
+    return performance.now();
+  }
+  return Date.now();
 }

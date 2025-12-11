@@ -15,195 +15,195 @@ import { LED_PALETTE } from "./ledPalette";
  * 必要に応じてページ・行・列を指定してボタンを登録してください。
  */
 export const MIDI_BUTTON_CONFIGS: ButtonConfig[] = [
-    {
-        key: "colorSelect",
-        type: "radio",
-        cells: [
-            { page: 0, row: 6, col: 4 },
-            { page: 0, row: 6, col: 5 },
-            { page: 0, row: 6, col: 6 },
-            { page: 0, row: 6, col: 7 },
-            { page: 0, row: 7, col: 4 },
-            { page: 0, row: 7, col: 5 },
-            { page: 0, row: 7, col: 6 },
-        ],
-        activeColor: LED_PALETTE.RED,
-        inactiveColor: LED_PALETTE.CYAN,
-        defaultValue: 0,
-    },
+  {
+    key: "colorSelect",
+    type: "radio",
+    cells: [
+      { page: 0, row: 6, col: 4 },
+      { page: 0, row: 6, col: 5 },
+      { page: 0, row: 6, col: 6 },
+      { page: 0, row: 6, col: 7 },
+      { page: 0, row: 7, col: 4 },
+      { page: 0, row: 7, col: 5 },
+      { page: 0, row: 7, col: 6 },
+    ],
+    activeColor: LED_PALETTE.RED,
+    inactiveColor: LED_PALETTE.CYAN,
+    defaultValue: 0,
+  },
 
-    {
-        key: "colorSelectRandom",
-        type: "random",
-        cells: [{ page: 0, row: 7, col: 7 }],
-        randomTarget: "colorSelect",  // 対象のradioボタンのkey
-        excludeCurrent: true,         // 現在値を除外（デフォルト: true）
-        speed: 1,                     // ランダム切り替えのスピード倍率（1=1beat毎、4=4倍速）
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.PURPLE,
-    },
+  {
+    key: "colorSelectRandom",
+    type: "random",
+    cells: [{ page: 0, row: 7, col: 7 }],
+    randomTarget: "colorSelect", // 対象のradioボタンのkey
+    excludeCurrent: true, // 現在値を除外（デフォルト: true）
+    speed: 1, // ランダム切り替えのスピード倍率（1=1beat毎、4=4倍速）
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.PURPLE,
+  },
 
-    {
-        key: "sceneSelect",
-        type: "radio",
-        cells: [
-            { page: 0, row: 0, col: 0 },
-            { page: 0, row: 1, col: 0 },
-            { page: 0, row: 2, col: 0 },
-            { page: 0, row: 3, col: 0 },
-            { page: 0, row: 0, col: 1 },
-            { page: 0, row: 1, col: 1 },
-            { page: 0, row: 2, col: 1 },
-            { page: 0, row: 3, col: 1 },
-            { page: 0, row: 0, col: 2 },
-            { page: 0, row: 1, col: 2 },
-            { page: 0, row: 2, col: 2 },
-            { page: 0, row: 3, col: 2 },
-            { page: 0, row: 0, col: 3 },
-            { page: 0, row: 1, col: 3 },
-            { page: 0, row: 2, col: 3 },
-            { page: 0, row: 3, col: 3 },
-            { page: 0, row: 0, col: 4 },
-            { page: 0, row: 1, col: 4 },
-            { page: 0, row: 2, col: 4 },
-            { page: 0, row: 3, col: 4 },
-            { page: 0, row: 0, col: 5 },
-            { page: 0, row: 1, col: 5 },
-            { page: 0, row: 2, col: 5 },
-            { page: 0, row: 3, col: 5 },
-            { page: 0, row: 0, col: 6 },
-            { page: 0, row: 1, col: 6 },
-            { page: 0, row: 2, col: 6 },
-            { page: 0, row: 3, col: 6 },
-            { page: 0, row: 0, col: 7 },
-        ],
-        activeColor: LED_PALETTE.BLUE,
-        inactiveColor: LED_PALETTE.PINK,
-        defaultValue: 0,
-    },
+  {
+    key: "sceneSelect",
+    type: "radio",
+    cells: [
+      { page: 0, row: 0, col: 0 },
+      { page: 0, row: 1, col: 0 },
+      { page: 0, row: 2, col: 0 },
+      { page: 0, row: 3, col: 0 },
+      { page: 0, row: 0, col: 1 },
+      { page: 0, row: 1, col: 1 },
+      { page: 0, row: 2, col: 1 },
+      { page: 0, row: 3, col: 1 },
+      { page: 0, row: 0, col: 2 },
+      { page: 0, row: 1, col: 2 },
+      { page: 0, row: 2, col: 2 },
+      { page: 0, row: 3, col: 2 },
+      { page: 0, row: 0, col: 3 },
+      { page: 0, row: 1, col: 3 },
+      { page: 0, row: 2, col: 3 },
+      { page: 0, row: 3, col: 3 },
+      { page: 0, row: 0, col: 4 },
+      { page: 0, row: 1, col: 4 },
+      { page: 0, row: 2, col: 4 },
+      { page: 0, row: 3, col: 4 },
+      { page: 0, row: 0, col: 5 },
+      { page: 0, row: 1, col: 5 },
+      { page: 0, row: 2, col: 5 },
+      { page: 0, row: 3, col: 5 },
+      { page: 0, row: 0, col: 6 },
+      { page: 0, row: 1, col: 6 },
+      { page: 0, row: 2, col: 6 },
+      { page: 0, row: 3, col: 6 },
+      { page: 0, row: 0, col: 7 },
+    ],
+    activeColor: LED_PALETTE.BLUE,
+    inactiveColor: LED_PALETTE.PINK,
+    defaultValue: 0,
+  },
 
-    {
-        key: "sceneSelectRandom",
-        type: "random",
-        cells: [{ page: 0, row: 3, col: 7 }],
-        randomTarget: "sceneSelect",  // 対象のradioボタンのkey
-        excludeCurrent: true,         // 現在値を除外（デフォルト: true）
-        speed: 1,                     // ランダム切り替えのスピード倍率（1=1beat毎、4=4倍速）
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.PURPLE,
-    },
+  {
+    key: "sceneSelectRandom",
+    type: "random",
+    cells: [{ page: 0, row: 3, col: 7 }],
+    randomTarget: "sceneSelect", // 対象のradioボタンのkey
+    excludeCurrent: true, // 現在値を除外（デフォルト: true）
+    speed: 1, // ランダム切り替えのスピード倍率（1=1beat毎、4=4倍速）
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.PURPLE,
+  },
 
-    {
-        key: "patternSelect",
-        type: "radio",
-        cells: [
-            { page: 0, row: 4, col: 4 },
-            { page: 0, row: 4, col: 5 },
-            { page: 0, row: 4, col: 6 },
-            { page: 0, row: 4, col: 7 },
-            { page: 0, row: 5, col: 4 },
-            { page: 0, row: 5, col: 5 },
-            { page: 0, row: 5, col: 6 },
-        ],
-        activeColor: LED_PALETTE.RED,
-        inactiveColor: LED_PALETTE.CYAN,
-        defaultValue: 0,
-    },
+  {
+    key: "patternSelect",
+    type: "radio",
+    cells: [
+      { page: 0, row: 4, col: 4 },
+      { page: 0, row: 4, col: 5 },
+      { page: 0, row: 4, col: 6 },
+      { page: 0, row: 4, col: 7 },
+      { page: 0, row: 5, col: 4 },
+      { page: 0, row: 5, col: 5 },
+      { page: 0, row: 5, col: 6 },
+    ],
+    activeColor: LED_PALETTE.RED,
+    inactiveColor: LED_PALETTE.CYAN,
+    defaultValue: 0,
+  },
 
-    {
-        key: "patternSelectRandom",
-        type: "random",
-        cells: [{ page: 0, row: 5, col: 7 }],
-        randomTarget: "patternSelect",  // 対象のradioボタンのkey
-        excludeCurrent: true,         // 現在値を除外（デフォルト: true）
-        speed: 1,                     // ランダム切り替えのスピード倍率（1=1beat毎、4=4倍速）
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.PURPLE,
-    },
+  {
+    key: "patternSelectRandom",
+    type: "random",
+    cells: [{ page: 0, row: 5, col: 7 }],
+    randomTarget: "patternSelect", // 対象のradioボタンのkey
+    excludeCurrent: true, // 現在値を除外（デフォルト: true）
+    speed: 1, // ランダム切り替えのスピード倍率（1=1beat毎、4=4倍速）
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.PURPLE,
+  },
 
-    {
-        key: "uiSelect",
-        type: "radio",
-        cells: [
-            { page: 0, row: 4, col: 0 },
-            { page: 0, row: 4, col: 1 },
-            { page: 0, row: 4, col: 2 },
-            { page: 0, row: 4, col: 3 },
-            { page: 0, row: 5, col: 0 },
-            { page: 0, row: 5, col: 1 },
-            { page: 0, row: 5, col: 2 },
-            { page: 0, row: 5, col: 3 },
-        ],
-        activeColor: LED_PALETTE.RED,
-        inactiveColor: LED_PALETTE.CYAN,
-        defaultValue: 0,
-    },
+  {
+    key: "uiSelect",
+    type: "radio",
+    cells: [
+      { page: 0, row: 4, col: 0 },
+      { page: 0, row: 4, col: 1 },
+      { page: 0, row: 4, col: 2 },
+      { page: 0, row: 4, col: 3 },
+      { page: 0, row: 5, col: 0 },
+      { page: 0, row: 5, col: 1 },
+      { page: 0, row: 5, col: 2 },
+      { page: 0, row: 5, col: 3 },
+    ],
+    activeColor: LED_PALETTE.RED,
+    inactiveColor: LED_PALETTE.CYAN,
+    defaultValue: 0,
+  },
 
-    {
-        key: "doubleSpeedToggle",
-        type: "toggle",
-        cells: [{ page: 0, row: 6, col: 0 }],
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.PINK,
-        defaultValue: false,
-    },
+  {
+    key: "doubleSpeedToggle",
+    type: "toggle",
+    cells: [{ page: 0, row: 6, col: 0 }],
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.PINK,
+    defaultValue: false,
+  },
 
-    {
-        key: "quadSpeedMomentary",
-        type: "momentary",
-        cells: [{ page: 0, row: 6, col: 1 }],
-        activeColor: LED_PALETTE.CYAN,
-        inactiveColor: LED_PALETTE.PINK,
-    },
+  {
+    key: "quadSpeedMomentary",
+    type: "momentary",
+    cells: [{ page: 0, row: 6, col: 1 }],
+    activeColor: LED_PALETTE.CYAN,
+    inactiveColor: LED_PALETTE.PINK,
+  },
 
-    {
-        key: "backShadowToggle",
-        type: "toggle",
-        cells: [{ page: 0, row: 7, col: 0 }],
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.YELLOW,
-        defaultValue: false,
-    },
+  {
+    key: "backShadowToggle",
+    type: "toggle",
+    cells: [{ page: 0, row: 7, col: 0 }],
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.YELLOW,
+    defaultValue: false,
+  },
 
-    {
-        key: "vibeToggle",
-        type: "toggle",
-        cells: [{ page: 0, row: 6, col: 2 }],
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.YELLOW,
-        defaultValue: false,
-    },
+  {
+    key: "vibeToggle",
+    type: "toggle",
+    cells: [{ page: 0, row: 6, col: 2 }],
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.YELLOW,
+    defaultValue: false,
+  },
 
-    {
-        key: "oneColorToggle",
-        type: "toggle",
-        cells: [{ page: 0, row: 6, col: 3 }],
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.YELLOW,
-        defaultValue: false,
-    },
+  {
+    key: "oneColorToggle",
+    type: "toggle",
+    cells: [{ page: 0, row: 6, col: 3 }],
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.YELLOW,
+    defaultValue: false,
+  },
 
-    {
-        key: "limitSelect",
-        type: "radio",
-        cells: [
-            { page: 0, row: 7, col: 1 },
-            { page: 0, row: 7, col: 2 },
-            { page: 0, row: 7, col: 3 },
-        ],
-        activeColor: LED_PALETTE.BLUE,
-        inactiveColor: LED_PALETTE.GREEN,
-        defaultValue: 0,
-    },
+  {
+    key: "limitSelect",
+    type: "radio",
+    cells: [
+      { page: 0, row: 7, col: 1 },
+      { page: 0, row: 7, col: 2 },
+      { page: 0, row: 7, col: 3 },
+    ],
+    activeColor: LED_PALETTE.BLUE,
+    inactiveColor: LED_PALETTE.GREEN,
+    defaultValue: 0,
+  },
 
-    {
-        key: "keyVisualToggle",
-        type: "toggle",
-        cells: [{ page: 7, row: 0, col: 0 }],
-        activeColor: LED_PALETTE.GREEN,
-        inactiveColor: LED_PALETTE.YELLOW,
-        defaultValue: false,
-    },
+  {
+    key: "keyVisualToggle",
+    type: "toggle",
+    cells: [{ page: 7, row: 0, col: 0 }],
+    activeColor: LED_PALETTE.GREEN,
+    inactiveColor: LED_PALETTE.YELLOW,
+    defaultValue: false,
+  },
 ];
 
 // ========================================
@@ -238,4 +238,14 @@ export const DEFAULT_PAGE_INDEX: number = 0;
  * フェーダーボタンのデフォルトトグル状態（9本分）
  * true = ON（ミュートまたはランダム有効）
  */
-export const DEFAULT_FADER_BUTTON_TOGGLE_STATE: boolean[] = [false, false, false, false, false, false, false, false, false];
+export const DEFAULT_FADER_BUTTON_TOGGLE_STATE: boolean[] = [
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+];

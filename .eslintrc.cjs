@@ -25,5 +25,24 @@ module.exports = {
         varsIgnorePattern: '^_',
       },
     ],
+    '@typescript-eslint/naming-convention': [
+      'warn',
+      {
+        selector: 'default',
+        format: ['camelCase'],
+        leadingUnderscore: 'allow',
+        trailingUnderscore: 'allow',
+      },
+      {
+        selector: ['variable', 'function'],
+        format: ['camelCase', 'UPPER_CASE'],
+        leadingUnderscore: 'allow',
+        trailingUnderscore: 'allow',
+      },
+      {
+        selector: ['typeLike'],
+        format: ['PascalCase'],
+      },
+    ],
   },
 };

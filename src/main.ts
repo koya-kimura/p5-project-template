@@ -47,7 +47,13 @@ const sketch = (p: p5) => {
 
     uiManager.draw(p, midiManager, font!, logo!);
 
-    effectManager.apply(p, midiManager, bpmManager.getBeat(), texManager.getTexture(), uiManager.getTexture());
+    effectManager.apply(
+      p,
+      midiManager,
+      bpmManager.getBeat(),
+      texManager.getTexture(),
+      uiManager.getTexture(),
+    );
   };
 
   // windowResized はブラウザのリサイズに追従してバッファを更新する。
