@@ -1,39 +1,13 @@
 import p5 from "p5";
-import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
-import type { UIAssets } from "../types";
+import type { VisualRenderContext } from "../types/render"; // 描画コンテキストの型定義
+import type { UIDrawFunction } from "../ui/uiDrawers"; // UI描画関数の型定義
+import { uiNone, uiDebug } from "../ui/uiDrawers"; // UI描画関数の実装
 
-type UIDrawFunction = (p: p5, tex: p5.Graphics, assets: UIAssets, beat: number) => void;
-
-const uiNone: UIDrawFunction = (
-  _p: p5,
-  tex: p5.Graphics,
-  _assets: UIAssets,
-  _beat: number,
-): void => {
-  tex.push();
-  tex.pop();
-};
-
-const uiDraw01: UIDrawFunction = (
-  p: p5,
-  tex: p5.Graphics,
-  assets: UIAssets,
-  _beat: number,
-): void => {
-  tex.push();
-  tex.textFont(assets.font);
-  tex.textSize(32);
-  tex.fill(255);
-  tex.textAlign(p.CENTER, p.CENTER);
-  tex.text("UI Draw Placeholder", tex.width / 2, tex.height / 2);
-  tex.pop();
-};
-
-const UI_DRAWERS: readonly UIDrawFunction[] = [uiNone, uiDraw01];
+// UI描画関数の配列。MIDI入力に基づいて選択される。
+const UI_DRAWERS: readonly UIDrawFunction[] = [uiDebug];
 
 /**
- * UIManager は UI オーバーレイ用の `p5.Graphics` を管理し、
- * MIDI 入力に基づいて描画パターンを切り替える。
+ * UIManager は UI オーバーレイ用の `p5.Graphics` を管理する。
  */
 export class UIManager {
   private renderTexture: p5.Graphics | undefined;
@@ -85,24 +59,26 @@ export class UIManager {
   /**
    * UI 描画を行い、MIDI の状態に応じたパターンを選択する。
    *
-   * @param p p5 インスタンス。
-   * @param midiManager APC Mini MK2 の入力状態。
-   * @param assets UI 描画に必要なフォントやロゴ。
+   * @param context 描画コンテキスト。
    */
-  draw(p: p5, midiManager: APCMiniMK2Manager, assets: UIAssets): void {
+  draw(context: VisualRenderContext): void {
     const texture = this.renderTexture;
     if (!texture) {
       throw new Error("Texture not initialized");
     }
 
     this.activePatternIndex = this.normalizePatternIndex(
-      midiManager.midiInput["uiSelect"] as number | undefined,
+      context.midiManager.midiInput["uiSelect"] as number | undefined,
     );
 
     texture.push();
     texture.clear();
+    const uiContext: VisualRenderContext = {
+      ...context,
+      tex: texture,
+    };
     const drawer = UI_DRAWERS[this.activePatternIndex] ?? UI_DRAWERS[0];
-    drawer(p, texture, assets, p.millis() / 500);
+    drawer(uiContext);
 
     texture.pop();
   }

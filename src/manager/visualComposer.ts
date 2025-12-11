@@ -1,35 +1,36 @@
 import p5 from "p5";
-import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
-import type { AudioMicManager } from "../utils/audio/audioMicManager";
-import type { CaptureManager } from "../utils/capture/captureManager";
-import { DebugScreen } from "../visuals/debugScreen";
-
-export interface VisualRenderContext {
-  p: p5;
-  tex: p5.Graphics;
-  midiManager: APCMiniMK2Manager;
-  beat: number;
-  audioManager?: AudioMicManager;
-  captureManager?: CaptureManager;
-  font?: p5.Font;
-}
+import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager"; // MIDIコントローラー管理クラス
+import type { AudioMicManager } from "../utils/audio/audioMicManager"; // オーディオ入力管理クラス
+import type { CaptureManager } from "../utils/capture/captureManager"; // カメラキャプチャ管理クラス
+import { DebugScreen } from "../visuals/debugScreen"; // デバッグ画面描画クラス
 
 /**
  * VisualComposer はレンダーターゲットとアクティブなビジュアル1つを管理する。
  */
 export class VisualComposer {
-  private renderTexture: p5.Graphics | undefined;
-  private debugScreen: DebugScreen;
+  private renderTexture: p5.Graphics | undefined; // ビジュアル描画用のオフスクリーンキャンバス
+  private debugScreen: DebugScreen; // デバッグ画面インスタンス
 
   constructor() {
     this.renderTexture = undefined;
     this.debugScreen = new DebugScreen();
   }
 
+  /**
+   * ビジュアル描画用の `p5.Graphics` を生成する。
+   *
+   * @param p p5 インスタンス。
+   */
   init(p: p5): void {
     this.renderTexture = p.createGraphics(p.width, p.height);
   }
 
+  /**
+   * ビジュアル描画結果を保持している `p5.Graphics` を返す。
+   *
+   * @returns ビジュアルテクスチャ。
+   * @throws Error 初期化前に呼び出された場合。
+   */
   getTexture(): p5.Graphics {
     if (!this.renderTexture) {
       throw new Error("Render texture not initialized");
@@ -37,6 +38,12 @@ export class VisualComposer {
     return this.renderTexture;
   }
 
+  /**
+   * テクスチャが初期化されていることを保証する。
+   *
+   * @returns テクスチャ。
+   * @throws Error 初期化されていない場合。
+   */
   private ensureTexture(): p5.Graphics {
     if (!this.renderTexture) {
       throw new Error("Render texture not initialized");
@@ -44,6 +51,16 @@ export class VisualComposer {
     return this.renderTexture;
   }
 
+  /**
+   * ビジュアルの更新処理。
+   *
+   * @param _p p5 インスタンス。
+   * @param _midiManager MIDI 状態。
+   * @param _beat 現在のビート。
+   * @param _audioManager オーディオマネージャー。
+   * @param _captureManager キャプチャマネージャー。
+   * @param _font フォント。
+   */
   update(
     _p: p5,
     _midiManager: APCMiniMK2Manager,
@@ -53,38 +70,48 @@ export class VisualComposer {
     _font?: p5.Font,
   ): void {}
 
+  /**
+   * ビジュアルを描画する。
+   *
+   * @param _p p5 インスタンス。
+   * @param _midiManager MIDI 状態。
+   * @param _beat 現在のビート。
+   * @param _audioManager オーディオマネージャー。
+   * @param _captureManager キャプチャマネージャー。
+   * @param _font フォント。
+   */
   draw(
-    p: p5,
-    midiManager: APCMiniMK2Manager,
-    beat: number,
-    audioManager?: AudioMicManager,
-    captureManager?: CaptureManager,
-    font?: p5.Font,
+    _p: p5,
+    _midiManager: APCMiniMK2Manager,
+    _beat: number,
+    _audioManager?: AudioMicManager,
+    _captureManager?: CaptureManager,
+    _font?: p5.Font,
   ): void {
     const tex = this.ensureTexture();
-    const context: VisualRenderContext = {
-      p,
-      tex,
-      midiManager,
-      beat,
-      audioManager,
-      captureManager,
-      font,
-    };
 
-    tex.clear();
+    // サンプル描画（赤い円）
     tex.push();
-    this.debugScreen.draw(context);
+    tex.background(0);
+    tex.fill(255, 0, 0);
+    tex.circle(tex.width / 2, tex.height / 2, 100);
     tex.pop();
   }
 
+  /**
+   * ウィンドウリサイズに合わせてテクスチャのサイズを更新する。
+   *
+   * @param p p5 インスタンス。
+   */
   resize(p: p5): void {
     const texture = this.ensureTexture();
     texture.resizeCanvas(p.width, p.height);
   }
 
+  /**
+   * リソースを解放する。
+   */
   dispose(): void {
-    this.debugScreen.dispose?.();
     this.renderTexture?.remove();
     this.renderTexture = undefined;
   }

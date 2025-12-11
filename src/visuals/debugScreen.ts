@@ -1,4 +1,4 @@
-import type { VisualRenderContext } from "../manager/visualComposer";
+import type { VisualRenderContext } from "../types/render";
 
 export class DebugScreen {
   draw(ctx: VisualRenderContext): void {
@@ -203,9 +203,5 @@ export class DebugScreen {
       tex.text("Capture inactive", previewX + previewWidth / 2, previewY + previewHeight / 2);
     }
     tex.pop();
-  }
-
-  dispose(): void {
-    // リソース解放不要
   }
 }

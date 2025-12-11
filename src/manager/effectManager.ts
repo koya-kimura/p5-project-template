@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
+import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager"; // MIDIコントローラー管理クラス
 
 /**
  * EffectManager はポストエフェクト用のシェーダーを読み込み、描画パイプラインへ適用する。
@@ -8,7 +8,7 @@ export class EffectManager {
   private shader: p5.Shader | undefined;
 
   constructor() {
-    this.shader = undefined;
+    this.shader = undefined; // シェーダーを未初期化状態で保持
   }
 
   /**
@@ -20,6 +20,7 @@ export class EffectManager {
    */
   load(p: p5, vertSource: string, fragSource: string): void {
     try {
+      // シェーダーを作成
       this.shader = p.createShader(vertSource, fragSource);
       if (!this.shader) {
         throw new Error("Shader creation failed");
@@ -27,7 +28,7 @@ export class EffectManager {
     } catch (error) {
       console.error("Shader loading failed", error);
       alert("Shader compilation failed. Effects will be disabled.");
-      this.shader = undefined;
+      this.shader = undefined; // エラー時はシェーダーを無効化
     }
   }
 
@@ -45,25 +46,29 @@ export class EffectManager {
     _midiManager: APCMiniMK2Manager,
     beat: number,
     sourceTexture: p5.Graphics,
-    _uiTexture: p5.Graphics,
+    uiTexture: p5.Graphics,
   ): void {
     if (!this.shader) {
-      // Fallback: draw texture directly without shader
+      // シェーダーがない場合は直接テクスチャを描画
       p.image(sourceTexture, 0, 0, p.width, p.height);
       return;
     }
 
     try {
+      // シェーダーを適用
       p.shader(this.shader);
+      // Uniform変数を設定
       this.shader.setUniform("u_tex", sourceTexture);
+      this.shader.setUniform("ui_tex", uiTexture);
       this.shader.setUniform("u_resolution", [p.width, p.height]);
       this.shader.setUniform("u_time", p.millis() / 1000.0);
       this.shader.setUniform("u_beat", beat);
+      // フルスクリーン矩形を描画
       p.rect(0, 0, p.width, p.height);
-      p.resetShader(); // Reset to avoid affecting subsequent draws
+      p.resetShader(); // シェーダーをリセット
     } catch (error) {
       console.error("Shader application failed", error);
-      // Fallback to direct texture draw
+      // エラー時は直接テクスチャを描画
       p.resetShader();
       p.image(sourceTexture, 0, 0, p.width, p.height);
     }

@@ -1,15 +1,16 @@
 import p5 from "p5";
-import { VisualComposer } from "../manager/visualComposer";
-import { EffectManager } from "../manager/effectManager";
-import { UIManager } from "../manager/uiManager";
-import { BPMManager } from "../utils/rhythm/bpmManager";
-import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
-import { AudioMicManager } from "../utils/audio/audioMicManager";
-import { CaptureManager } from "../utils/capture/captureManager";
-import type { AppConfig } from "./appConfig";
-import { defaultAppConfig } from "./appConfig";
-import mainVert from "../shaders/main.vert";
-import postFrag from "../shaders/post.frag";
+import { VisualComposer } from "../manager/visualComposer"; // ビジュアル描画を管理するマネージャー
+import { EffectManager } from "../manager/effectManager"; // シェーダーエフェクトを適用するマネージャー
+import { UIManager } from "../manager/uiManager"; // UIオーバーレイを描画するマネージャー
+import { BPMManager } from "../utils/rhythm/bpmManager"; // BPMとビートを管理するユーティリティ
+import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager"; // MIDIコントローラー（APC Mini MK2）の管理
+import { AudioMicManager } from "../utils/audio/audioMicManager"; // オーディオ入力（マイク）を管理
+import { CaptureManager } from "../utils/capture/captureManager"; // カメラキャプチャを管理
+import type { AppConfig } from "./appConfig"; // 設定インターフェース
+import { defaultAppConfig } from "./appConfig"; // デフォルト設定
+import type { VisualRenderContext } from "../types/render"; // 描画コンテキスト
+import mainVert from "../shaders/main.vert"; // 頂点シェーダーソース
+import postFrag from "../shaders/post.frag"; // フラグメントシェーダーソース
 
 /**
  * ランタイムで共有するフォントやロゴなどのアセット。
@@ -62,16 +63,20 @@ export interface AppRuntime {
  * @returns AppRuntime インスタンス。
  */
 export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
+  // 設定をデフォルトとマージ
   const resolvedConfig: AppConfig = { ...defaultAppConfig, ...config };
 
+  // 各マネージャーのインスタンス生成
   const visualComposer = new VisualComposer();
   const effectManager = new EffectManager();
   const uiManager = new UIManager();
   const bpmManager = new BPMManager();
   const midiManager = new APCMiniMK2Manager();
+  // オプション機能は設定に応じて生成
   const audioManager = resolvedConfig.enableAudio ? new AudioMicManager() : undefined;
   const captureManager = resolvedConfig.enableCapture ? new CaptureManager() : undefined;
 
+  // コンテキストオブジェクトを作成（各マネージャーと設定を束ねる）
   const context: AppContext = {
     config: resolvedConfig,
     visualComposer,
@@ -88,6 +93,7 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
   const loadAssets = async (p: p5): Promise<void> => {
     try {
+      // ロゴ画像とフォントを並行して読み込み
       const [logo, font] = await Promise.all([
         p.loadImage("/image/logo/kimura.png"),
         p.loadFont("/font/Jost-Regular.ttf"),
@@ -102,14 +108,18 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
   return {
     async initialize(p: p5): Promise<void> {
       try {
+        // 各マネージャーの初期化
         visualComposer.init(p);
         uiManager.init(p);
         midiManager.init();
 
+        // シェーダーの読み込み
         effectManager.load(p, mainVert, postFrag);
 
+        // アセット読み込みタスク
         const tasks: Promise<void>[] = [loadAssets(p)];
 
+        // オプション機能の初期化（エラー時は警告を表示して続行）
         if (audioManager) {
           tasks.push(
             audioManager.init().catch((error) => {
@@ -128,6 +138,7 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
           );
         }
 
+        // 全ての初期化タスクを待機
         await Promise.all(tasks);
         initialized = true;
       } catch (error) {
@@ -139,11 +150,12 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
     drawFrame(p: p5): void {
       if (!initialized) {
-        return;
+        return; // 初期化完了前に描画しない
       }
 
-      p.background(0);
+      // p.background(0); // 背景を黒でクリア（エフェクト適用前にクリア不要）
 
+      // 各マネージャーの更新
       bpmManager.update();
       audioManager?.update();
       captureManager?.update(p);
@@ -151,19 +163,32 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
       const beat = bpmManager.getBeat();
       const visualFont = context.assets.font;
 
+      // ビジュアルの更新と描画
       visualComposer.update(p, midiManager, beat, audioManager, captureManager, visualFont);
       visualComposer.draw(p, midiManager, beat, audioManager, captureManager, visualFont);
 
+      // UIの描画（アセットが読み込まれていれば）
       const { font, logo } = context.assets;
       if (font && logo) {
-        uiManager.draw(p, midiManager, { font, logo });
+        const uiContext: VisualRenderContext = {
+          p,
+          tex: uiManager.getTexture(), // UI描画では内部でテクスチャを使用
+          midiManager,
+          beat,
+          audioManager,
+          captureManager,
+          font,
+        };
+        uiManager.draw(uiContext);
       } else {
+        // アセット未読み込み時はUIテクスチャをクリア
         const uiTexture = uiManager.getTexture();
         uiTexture.push();
         uiTexture.clear();
         uiTexture.pop();
       }
 
+      // エフェクトの適用
       effectManager.apply(
         p,
         midiManager,
@@ -174,7 +199,9 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
     },
 
     handleResize(p: p5): void {
+      // キャンバスをウィンドウサイズにリサイズ
       p.resizeCanvas(p.windowWidth, p.windowHeight);
+      // 各マネージャーにリサイズを通知
       visualComposer.resize(p);
       uiManager.resize(p);
       captureManager?.resize(p);
@@ -182,23 +209,26 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
     handleKeyPressed(p: p5): void {
       if (p.keyCode === 32) {
-        p.fullscreen(true);
+        p.fullscreen(true); // スペースキーでフルスクリーン
       }
+      // オーディオコンテキストを再開（ユーザー操作が必要）
       audioManager?.resume().catch(() => undefined);
     },
 
     handleMousePressed(): void {
+      // オーディオコンテキストを再開（ユーザー操作が必要）
       audioManager?.resume().catch(() => undefined);
     },
 
     dispose(): void {
+      // リソース解放
       visualComposer.dispose();
       captureManager?.dispose();
       audioManager?.dispose();
     },
 
     getContext(): AppContext {
-      return context;
+      return context; // コンテキスト参照を返す
     },
   };
 };
