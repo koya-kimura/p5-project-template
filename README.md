@@ -1,6 +1,6 @@
 # p5.js ビジュアルテンプレート
 
-p5.js（インスタンスモード）を TypeScript で扱い、MIDI・マイク入力・カメラキャプチャ・WebGL ポストエフェクトを組み合わせたライブビジュアル用テンプレートです。初期シーンと各種マネージャが揃っているので、導入直後からリアクティブな表現づくりを始められます。
+p5.js（インスタンスモード）を TypeScript で扱い、MIDI・マイク入力・カメラキャプチャ・WebGL ポストエフェクトを組み合わせたライブビジュアル用テンプレートです。初期ビジュアルと各種マネージャが揃っているので、導入直後からリアクティブな表現づくりを始められます。
 
 ## クイックスタート
 1. 必要環境を整えます。
@@ -41,13 +41,13 @@ src/
   core/
     appConfig.ts         … Audio/Capture 有効化フラグの定義
     appRuntime.ts        … マネージャ初期化とメインループ制御
-    texManager.ts        … オフスクリーンテクスチャとシーン制御
+    visualComposer.ts    … オフスクリーンテクスチャの生成と描画補助
     effectManager.ts     … ポストエフェクト適用
     uiManager.ts         … UI オーバーレイ描画
   audio/AudioMicManager.ts      … マイク入力の解析
   capture/CaptureManager.ts     … Web カメラキャプチャを p5.Graphics 化
   midi/                         … Web MIDI および APC Mini MK2 実装
-  scenes/placeholderScene.ts    … サンプルシーン（MIDI/Audio/Capture 連携）
+  visuals/debugScreen.ts        … サンプルビジュアル（MIDI/Audio/Capture 連携）
   shaders/                      … Vite で直接インポートするシェーダー
   types/, utils/                … 型定義とユーティリティ群
 ```
@@ -62,8 +62,9 @@ src/
     const runtime = createAppRuntime({ enableAudio: false, enableCapture: true });
     ```
   - ランタイムは `initialize / drawFrame / handleResize / handleKeyPressed / handleMousePressed` を提供し、p5.js の `setup/draw` から呼び出すだけでループ処理が成立します。
-- `TexManager` はレンダーテクスチャを作成し、アクティブシーン（現状は `PlaceholderScene`）に MIDI・ビート・オプションの Audio/Capture を渡して描画を委譲します。
-- `EffectManager` は `src/shaders/main.vert` と `src/shaders/post.frag` を使ってポストプロセスを適用し、`TexManager` と `UIManager` の出力を合成します。
+  - 利用中のビジュアルを切り替えたい場合は `runtime.setVisual(createVisual)` のようにファクトリ関数を渡します。未指定の間はデフォルトで `debugScreen` が描画されます。
+- `VisualComposer` はレンダーテクスチャを作成し、現在アクティブなビジュアル 1 つに MIDI・ビート・オプションの Audio/Capture を渡して描画を委譲します。ハッシュマップや履歴は保持せず、外部から与えられたファクトリで差し替えます。
+- `EffectManager` は `src/shaders/main.vert` と `src/shaders/post.frag` を使ってポストプロセスを適用し、`VisualComposer` と `UIManager` の出力を合成します。
 - `UIManager` はオーバーレイ用の `p5.Graphics` を生成し、MIDI 状態に応じた UI を描画します。
 
 ### p5.js の役割分担
@@ -76,7 +77,7 @@ src/
 ### MIDI (APC Mini MK2)
 - `src/midi/apcmini_mk2/` にマッピング・LED パレット・デバッグ描画がまとまっています。
 - `APCMiniMK2Manager` は Web MIDI の初期化とイベント購読を行い、フェーダー値・ボタン状態を外部へ提供します。
-- `uiManager` や `PlaceholderScene` でフェーダー値を参照することで、手持ちのハードウェアが無い状態でもパラメータを確認できます。
+- `uiManager` や `debugScreen` でフェーダー値を参照することで、手持ちのハードウェアが無い状態でもパラメータを確認できます。
 
 ### オーディオ（マイク入力）
 - `AudioMicManager` が `getVolume()` と `getFrequencyData()` を提供します。AudioContext は初回初期化時に権限を要求し、ユーザー操作で停止した場合は `runtime.handleKeyPressed` / `handleMousePressed` から再開を試みます。
@@ -84,13 +85,12 @@ src/
 
 ### キャプチャ（Web カメラ）
 - `CaptureManager` が `createCapture` した映像を `p5.Graphics` にリサイズ＆センタリングして保持します。
-- リサイズ時は内部バッファを追従させ、`PlaceholderScene` では右上にプレビューを描画します。
+- リサイズ時は内部バッファを追従させ、`debugScreen` では右上にプレビューを描画します。
 - `enableCapture: false` の場合は初期化されないため、カメラ権限を求められたくないデモでも安全に利用できます。
 
-### シーンの追加
-1. `src/scenes/` に `init/update/draw/resize` を持つクラスを追加します。
-2. `TexManager` のコンストラクタで新しいシーンを差し替える、もしくはシーン切り替え機構を実装します。
-3. 必要に応じて `AppRuntime` に渡すマネージャ（MIDI, Audio, Capture, BPM など）をシーンの API と同期させます。
+### ビジュアルの追加
+1. `src/visuals/` に `VisualProgram` を生成するファクトリ（例: `export const createYourVisual = (): VisualProgram => ({ ... })`）を追加し、必要なライフサイクル（`init`/`update`/`draw`/`resize`）だけを定義します。
+2. ランタイム生成後に `runtime.setVisual(createYourVisual)` を呼び、アクティブなビジュアルを差し替えます。初期化中に他のアセット読み込みを行う場合は、完了後に実行してください。
 
 ## シェーダーパイプライン
 - `EffectManager.apply` がオフスクリーンテクスチャをポストシェーダーへ渡し、最終的な画面に描画します。

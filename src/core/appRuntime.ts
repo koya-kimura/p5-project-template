@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { TexManager } from "./texManager";
+import { VisualComposer } from "./visualComposer";
 import { EffectManager } from "./effectManager";
 import { UIManager } from "./uiManager";
 import { BPMManager } from "../utils/rhythm/BPMManager";
@@ -8,8 +8,6 @@ import { AudioMicManager } from "../audio/AudioMicManager";
 import { CaptureManager } from "../capture/CaptureManager";
 import type { AppConfig } from "./appConfig";
 import { defaultAppConfig } from "./appConfig";
-import { PlaceholderScene } from "../scenes/debugScreen";
-import type { VisualScene } from "../scenes/types";
 import mainVert from "../shaders/main.vert";
 import postFrag from "../shaders/post.frag";
 
@@ -26,12 +24,11 @@ interface RuntimeAssets {
  */
 export interface AppContext {
   readonly config: AppConfig;
-  readonly texManager: TexManager;
+  readonly visualComposer: VisualComposer;
   readonly effectManager: EffectManager;
   readonly uiManager: UIManager;
   readonly bpmManager: BPMManager;
   readonly midiManager: APCMiniMK2Manager;
-  scene: VisualScene;
   audioManager?: AudioMicManager;
   captureManager?: CaptureManager;
   assets: RuntimeAssets;
@@ -55,8 +52,6 @@ export interface AppRuntime {
   dispose(): void;
   /** 現在のコンテキスト参照を取得。 */
   getContext(): AppContext;
-  /** シーン差し替え。初期化済みの場合は即座に `init` を呼び出す。 */
-  setScene(scene: VisualScene, p?: p5): void;
 }
 
 /**
@@ -69,9 +64,7 @@ export interface AppRuntime {
 export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
   const resolvedConfig: AppConfig = { ...defaultAppConfig, ...config };
 
-  const createScene = resolvedConfig.createScene ?? (() => new PlaceholderScene());
-  const scene = createScene();
-  const texManager = new TexManager(scene);
+  const visualComposer = new VisualComposer();
   const effectManager = new EffectManager();
   const uiManager = new UIManager();
   const bpmManager = new BPMManager();
@@ -81,12 +74,11 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
   const context: AppContext = {
     config: resolvedConfig,
-    texManager,
+    visualComposer,
     effectManager,
     uiManager,
     bpmManager,
     midiManager,
-    scene,
     audioManager,
     captureManager,
     assets: {},
@@ -109,7 +101,7 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
   return {
     async initialize(p: p5): Promise<void> {
-      texManager.init(p);
+      visualComposer.init(p);
       uiManager.init(p);
       midiManager.init();
 
@@ -144,13 +136,15 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
       p.background(0);
 
-      const beat = bpmManager.getBeat();
-
+      bpmManager.update();
       audioManager?.update();
       captureManager?.update(p);
 
-      texManager.update(p, midiManager, beat, audioManager, captureManager);
-      texManager.draw(p, midiManager, beat, audioManager, captureManager);
+      const beat = bpmManager.getBeat();
+      const visualFont = context.assets.font;
+
+      visualComposer.update(p, midiManager, beat, audioManager, captureManager, visualFont);
+      visualComposer.draw(p, midiManager, beat, audioManager, captureManager, visualFont);
 
       const { font, logo } = context.assets;
       if (font && logo) {
@@ -162,12 +156,12 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
         uiTexture.pop();
       }
 
-      effectManager.apply(p, midiManager, beat, texManager.getTexture(), uiManager.getTexture());
+      effectManager.apply(p, midiManager, beat, visualComposer.getTexture(), uiManager.getTexture());
     },
 
     handleResize(p: p5): void {
       p.resizeCanvas(p.windowWidth, p.windowHeight);
-      texManager.resize(p);
+      visualComposer.resize(p);
       uiManager.resize(p);
       captureManager?.resize(p);
     },
@@ -184,17 +178,13 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
     },
 
     dispose(): void {
+      visualComposer.dispose();
       captureManager?.dispose();
       audioManager?.dispose();
     },
 
     getContext(): AppContext {
       return context;
-    },
-
-    setScene(newScene: VisualScene, p?: p5): void {
-      context.scene = newScene;
-      texManager.setScene(newScene, p);
     },
   };
 };

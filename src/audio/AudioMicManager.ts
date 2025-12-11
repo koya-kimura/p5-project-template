@@ -93,6 +93,64 @@ export class AudioMicManager {
   }
 
   /**
+   * 指定した周波数帯域の平均レベル（0.0〜1.0）を返す。
+   *
+   * @param minFrequency 最小周波数（Hz）
+   * @param maxFrequency 最大周波数（Hz）
+   */
+  getBandLevel(minFrequency: number, maxFrequency: number): number {
+    if (!this.frequencyData || !this.analyser || !this.audioContext) {
+      return 0;
+    }
+
+    const nyquist = this.audioContext.sampleRate / 2;
+    if (nyquist <= 0) {
+      return 0;
+    }
+
+    const clampedMin = Math.max(0, Math.min(minFrequency, nyquist));
+    const clampedMax = Math.max(clampedMin, Math.min(maxFrequency, nyquist));
+    if (clampedMax <= clampedMin) {
+      return 0;
+    }
+
+    const binBandwidth = nyquist / this.frequencyData.length;
+    if (binBandwidth <= 0) {
+      return 0;
+    }
+
+    let startIndex = Math.floor(clampedMin / binBandwidth);
+    let endIndex = Math.ceil(clampedMax / binBandwidth);
+
+    startIndex = Math.max(0, Math.min(startIndex, this.frequencyData.length - 1));
+    endIndex = Math.max(startIndex, Math.min(endIndex, this.frequencyData.length - 1));
+
+    let sum = 0;
+    let count = 0;
+    for (let i = startIndex; i <= endIndex; i++) {
+      sum += this.frequencyData[i];
+      count += 1;
+    }
+
+    if (count === 0) {
+      return 0;
+    }
+
+    return (sum / count) / 255;
+  }
+
+  /**
+   * 周波数帯域の平均レベルがしきい値を超えたかどうかを判定する。
+   *
+   * @param minFrequency 最小周波数（Hz）
+   * @param maxFrequency 最大周波数（Hz）
+   * @param threshold 発火させたいしきい値（0.0〜1.0）
+   */
+  getFrequencyTrigger(minFrequency: number, maxFrequency: number, threshold = 0.25): boolean {
+    return this.getBandLevel(minFrequency, maxFrequency) >= threshold;
+  }
+
+  /**
    * AudioContext と MediaStream を解放し、再初期化可能な状態へ戻す。
    */
   dispose(): void {
