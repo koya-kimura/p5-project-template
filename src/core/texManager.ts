@@ -1,5 +1,6 @@
 import p5 from "p5";
 import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
+import type { AudioMicManager } from "../audio/AudioMicManager";
 import { PlaceholderScene } from "../scenes/placeholderScene";
 
 // TexManager はレンダーターゲットとシーン描画をまとめるハブ。
@@ -37,15 +38,15 @@ export class TexManager {
     this.mainScene.resize(p);
   }
 
-  update(p: p5, midiManager: APCMiniMK2Manager, beat: number): void {
-    this.mainScene.update(p, midiManager, beat);
+  update(p: p5, midiManager: APCMiniMK2Manager, audioManager: AudioMicManager, beat: number): void {
+    this.mainScene.update(p, midiManager, audioManager, beat);
   }
 
-  draw(p: p5, midiManager: APCMiniMK2Manager, beat: number): void {
+  draw(p: p5, midiManager: APCMiniMK2Manager, audioManager: AudioMicManager, beat: number): void {
     const texture = this.renderTexture;
     if (!texture) {
       throw new Error("Texture not initialized");
     }
-    this.mainScene.draw(p, texture, midiManager, beat);
+    this.mainScene.draw(p, texture, midiManager, audioManager, beat);
   }
 }

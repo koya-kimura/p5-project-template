@@ -6,6 +6,7 @@ import { EffectManager } from "./core/effectManager";
 import { UIManager } from "./core/uiManager";
 import { BPMManager } from "./utils/rhythm/BPMManager";
 import { APCMiniMK2Manager } from "./midi/apcmini_mk2/APCMiniMK2Manager";
+import { AudioMicManager } from "./audio/AudioMicManager";
 
 // シェーダーを import（vite-plugin-glsl により文字列として読み込まれる）
 import mainVert from "./shaders/main.vert";
@@ -16,6 +17,7 @@ const effectManager = new EffectManager();
 const bpmManager = new BPMManager();
 const midiManager = new APCMiniMK2Manager();
 const uiManager = new UIManager();
+const audioMicManager = new AudioMicManager();
 
 let logo: p5.Image | undefined;
 let font: p5.Font | undefined;
@@ -30,6 +32,9 @@ const sketch = (p: p5) => {
     texManager.init(p);
     uiManager.init(p);
     midiManager.init();
+    audioMicManager.init().catch((error) => {
+      console.error("Microphone initialization failed", error);
+    });
 
     // シェーダーを直接文字列から生成（ホットリロード対応）
     effectManager.load(p, mainVert, postFrag);
@@ -44,8 +49,10 @@ const sketch = (p: p5) => {
 
     const beat = bpmManager.getBeat();
 
-    texManager.update(p, midiManager, beat);
-    texManager.draw(p, midiManager, beat);
+    audioMicManager.update();
+
+    texManager.update(p, midiManager, audioMicManager, beat);
+    texManager.draw(p, midiManager, audioMicManager, beat);
 
     if (font && logo) {
       uiManager.draw(p, midiManager, { font, logo });
@@ -70,6 +77,11 @@ const sketch = (p: p5) => {
     if (p.keyCode === 32) {
       p.fullscreen(true);
     }
+    audioMicManager.resume().catch(() => undefined);
+  };
+
+  p.mousePressed = () => {
+    audioMicManager.resume().catch(() => undefined);
   };
 };
 

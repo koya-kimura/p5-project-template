@@ -41,6 +41,8 @@ config/
   .prettierignore  -> Prettier 対象外パス
 src/
   main.ts          -> p5エントリーポイント（インスタンスモードのセットアップとループ）
+  audio/
+    AudioMicManager.ts -> マイク入力の取得と音量解析
   core/
     texManager.ts  -> レンダーテクスチャとアクティブシーンを管理
     effectManager.ts-> ポストシェーダーの読み込み・適用
@@ -82,6 +84,7 @@ src/
 ## テンプレート拡張のヒント
 - `src/scenes/`にシーンを追加する、`src/midi/apcmini_mk2/`で`APCMiniMK2Base`を継承したパターンを作るなど、用途に応じてモジュールを増やせます。
 - `BPMManager`と`src/utils/math/easing.ts`のイージングを組み合わせ、テンポに合わせたアニメーションを構築できます。
+- `AudioMicManager` を `main.ts` から初期化することで、マイク音量や周波数データを取得してエフェクトへ反映できます。音声の許可ダイアログが表示された場合は「許可」を選択し、必要に応じてクリックやキー入力で AudioContext を再開してください。
 - `public/`フォルダー内のサンプルアセットを差し替え、自分のフォントやテクスチャで演出を強化してください。
 
 ## 開発ガイドライン

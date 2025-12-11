@@ -1,6 +1,7 @@
 import p5 from "p5";
 import { UniformRandom } from "../utils/math/UniformRandom";
 import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
+import type { AudioMicManager } from "../audio/AudioMicManager";
 
 /**
  * PlaceholderScene はテンプレートの初期表示用シンプルなシーンです。
@@ -15,15 +16,22 @@ export class PlaceholderScene {
     this.hue = 0;
   }
 
-  update(p: p5, midiManager: APCMiniMK2Manager, beat: number): void {
+  update(p: p5, midiManager: APCMiniMK2Manager, audioManager: AudioMicManager, beat: number): void {
     const speed = midiManager.faderValues?.[0] ?? 0.5;
-    this.rotation = beat * p.TWO_PI * (0.25 + speed);
+    const audioBoost = audioManager.getVolume() * 2;
+    this.rotation = beat * p.TWO_PI * (0.25 + speed + audioBoost);
 
     const hueRate = midiManager.faderValues?.[1] ?? 0.3;
-    this.hue = (this.hue + hueRate * 2 + beat * 0.1) % 360;
+    this.hue = (this.hue + hueRate * 2 + beat * 0.1 + audioBoost * 5) % 360;
   }
 
-  draw(p: p5, tex: p5.Graphics, midiManager: APCMiniMK2Manager, beat: number): void {
+  draw(
+    p: p5,
+    tex: p5.Graphics,
+    midiManager: APCMiniMK2Manager,
+    audioManager: AudioMicManager,
+    beat: number,
+  ): void {
     const amplitude = midiManager.faderValues?.[2] ?? 0.5;
     const pulse = (Math.sin(beat * p.PI * 2) + 1) / 2;
     const size = tex.height * (0.2 + amplitude * 0.3 + pulse * 0.2);
@@ -47,6 +55,41 @@ export class PlaceholderScene {
     tex.stroke(0, 0, 100, 40 + ringSeed * 40);
     tex.strokeWeight(4 + ringSeed * 4);
     tex.ellipse(0, 0, ringRadius, ringRadius);
+
+    tex.pop();
+    tex.colorMode(p.RGB, 255);
+
+    const frequencyData = audioManager.getFrequencyData();
+    if (frequencyData.length === 0) {
+      return;
+    }
+
+    const spectrumHeight = tex.height * 0.25;
+    const marginX = tex.width * 0.08;
+    const marginY = tex.height * 0.08;
+    const barCount = 64;
+    const step = Math.max(1, Math.floor(frequencyData.length / barCount));
+    const barWidth = (tex.width - marginX * 2) / barCount;
+
+    tex.push();
+    tex.translate(marginX, tex.height - marginY);
+    tex.noStroke();
+
+    for (let i = 0; i < barCount; i++) {
+      const startIndex = i * step;
+      let sum = 0;
+      for (let j = 0; j < step && startIndex + j < frequencyData.length; j++) {
+        sum += frequencyData[startIndex + j];
+      }
+      const average = sum / step;
+      const normalized = average / 255;
+      const barHeight = spectrumHeight * normalized;
+
+      const hue = (this.hue + i * 4) % 360;
+      tex.colorMode(p.HSB, 360, 100, 100, 100);
+      tex.fill(hue, 80, 90, 80);
+      tex.rect(i * barWidth, -barHeight, barWidth * 0.8, barHeight);
+    }
 
     tex.pop();
     tex.colorMode(p.RGB, 255);
