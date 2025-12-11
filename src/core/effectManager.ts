@@ -10,15 +10,10 @@ export class EffectManager {
         this.shader = null;
     }
 
-    // load は頂点・フラグメントシェーダーを読み込み、Promise を待機して保持する。
-    async load(p: p5, vertPath: string, fragPath: string): Promise<void> {
-        const shaderOrPromise = p.loadShader(vertPath, fragPath);
-
-        if (shaderOrPromise instanceof Promise) {
-            this.shader = await shaderOrPromise;
-        } else {
-            this.shader = shaderOrPromise;
-        }
+    // load はシェーダーソース文字列から p5.Shader を生成して保持する。
+    // vite-plugin-glsl により import されたシェーダー文字列を直接受け取る。
+    load(p: p5, vertSource: string, fragSource: string): void {
+        this.shader = p.createShader(vertSource, fragSource);
     }
 
     // apply は保持しているシェーダーをアクティブにし、各種 Uniform を設定して描画する。

@@ -7,6 +7,10 @@ import { UIManager } from "./core/uiManager";
 import { BPMManager } from "./utils/BPMManager";
 import { APCMiniMK2Manager } from "./midi/apcmini_mk2/APCMiniMK2Manager";
 
+// シェーダーを import（vite-plugin-glsl により文字列として読み込まれる）
+import mainVert from "./shaders/main.vert";
+import postFrag from "./shaders/post.frag";
+
 const texManager = new TexManager();
 const effectManager = new EffectManager();
 const bpmManager = new BPMManager();
@@ -27,11 +31,8 @@ const sketch = (p: p5) => {
     uiManager.init(p);
     midiManager.init();
 
-    await effectManager.load(
-      p,
-      "/shader/dist/main.vert",
-      "/shader/dist/post.frag",
-    );
+    // シェーダーを直接文字列から生成（ホットリロード対応）
+    effectManager.load(p, mainVert, postFrag);
 
     logo = await p.loadImage("/image/logo/kimura.png");
     font = await p.loadFont("/font/Jost-Regular.ttf");

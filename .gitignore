@@ -26,3 +26,6 @@ dist-ssr
 # 個人用メモとTODOファイル
 memo.md
 TODO.md
+
+# シェーダービルド生成物
+public/shader/dist/
