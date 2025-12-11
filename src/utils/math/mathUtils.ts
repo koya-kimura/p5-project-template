@@ -61,3 +61,7 @@ export const colorcode2rgbArray = (colorcode: string): [number, number, number, 
 export const clamp = (value: number, min: number, max: number): number => {
   return Math.min(Math.max(value, min), max);
 };
+
+export const zigzag = (value: number): number => {
+  return Math.abs(value % 2 - 1);
+};

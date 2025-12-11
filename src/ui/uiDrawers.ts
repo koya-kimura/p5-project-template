@@ -26,17 +26,17 @@ export const uiDebug: UIDrawFunction = (
 
   const bandDefinitions = audioManager
     ? (
-        [
-          { label: "Sub 20-120Hz", min: 20, max: 120, threshold: 0.2 },
-          { label: "LoMid 120-400Hz", min: 120, max: 400, threshold: 0.2 },
-          { label: "Mid 400-2kHz", min: 400, max: 2000, threshold: 0.18 },
-          { label: "Hi 2k-8kHz", min: 2000, max: 8000, threshold: 0.16 },
-        ] as const
-      ).map((band) => {
-        const level = audioManager.getBandLevel(band.min, band.max);
-        const triggered = audioManager.getFrequencyTrigger(band.min, band.max, band.threshold);
-        return { ...band, level, triggered };
-      })
+      [
+        { label: "Sub 20-120Hz", min: 20, max: 120, threshold: 0.2 },
+        { label: "LoMid 120-400Hz", min: 120, max: 400, threshold: 0.2 },
+        { label: "Mid 400-2kHz", min: 400, max: 2000, threshold: 0.18 },
+        { label: "Hi 2k-8kHz", min: 2000, max: 8000, threshold: 0.16 },
+      ] as const
+    ).map((band) => {
+      const level = audioManager.getBandLevel(band.min, band.max);
+      const triggered = audioManager.getFrequencyTrigger(band.min, band.max, band.threshold);
+      return { ...band, level, triggered };
+    })
     : [];
 
   const captureReady = captureManager?.isReady() ?? false;
@@ -60,17 +60,11 @@ export const uiDebug: UIDrawFunction = (
       (band) => `${band.label}: ${band.triggered ? "ON" : "off"} (lvl ${band.level.toFixed(2)})`,
     ),
     `Capture Ready: ${captureReady ? "yes" : "no"}`,
-    `Capture Size: ${
-      captureTexture ? `${captureTexture.width}x${captureTexture.height}` : "n/a"
+    `Capture Size: ${captureTexture ? `${captureTexture.width}x${captureTexture.height}` : "n/a"
     }`,
   ];
 
   const infoHeight = infoLines.length * lineHeight + 24;
-
-  tex.push();
-  tex.noStroke();
-  tex.fill(0, 220);
-  tex.rect(infoX - 16, infoY - 16, infoWidth + 32, infoHeight, 12);
 
   tex.fill(255);
   tex.textSize(16);
