@@ -3,11 +3,11 @@ import p5 from "p5";
 import { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
 
 export class EffectManager {
-  private shader: p5.Shader | null;
+  private shader: p5.Shader | undefined;
 
   // constructor は空のシェーダー参照を初期化する。
   constructor() {
-    this.shader = null;
+    this.shader = undefined;
   }
 
   // load はシェーダーソース文字列から p5.Shader を生成して保持する。
@@ -19,7 +19,7 @@ export class EffectManager {
   // apply は保持しているシェーダーをアクティブにし、各種 Uniform を設定して描画する。
   apply(
     p: p5,
-    midiManager: APCMiniMK2Manager,
+    _midiManager: APCMiniMK2Manager,
     beat: number,
     sourceTexture: p5.Graphics,
     _uiTexture: p5.Graphics,

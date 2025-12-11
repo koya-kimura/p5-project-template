@@ -13,7 +13,7 @@ export class BPMManager {
   private isPlaying: boolean; // 再生中フラグ
   private isBeatUpdated: boolean = false; // 直前の update でビートが更新されたか
 
-  private pendingBPM: number | null = null; // 次のビートで適用される予定のBPM
+  private pendingBPM: number | undefined = undefined; // 次のビートで適用される予定のBPM
   private pendingBPMChange: boolean = false; // BPM変更が予約されたか
 
   private tapTimes: number[] = []; // タップされた時刻の履歴
@@ -129,10 +129,10 @@ export class BPMManager {
       this.elapsed %= this.interval; // 次のビート開始までの残り時間を計算
 
       // 予約されたBPM変更を適用
-      if (this.pendingBPMChange && this.pendingBPM !== null) {
+      if (this.pendingBPMChange && this.pendingBPM !== undefined) {
         this.bpm = this.pendingBPM;
         this.interval = 60000 / this.bpm;
-        this.pendingBPM = null;
+        this.pendingBPM = undefined;
         this.pendingBPMChange = false;
         console.log(`BPM successfully changed to ${this.bpm}`);
       }

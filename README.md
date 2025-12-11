@@ -43,9 +43,16 @@ src/
   midi/
     midiManager.ts -> Web MIDI初期化ヘルパー
     apcmini_mk2/   -> APC Mini MK2向けパターンとデバッグ描画
-  rhythm/          -> テンポ同期ユーティリティ
   scenes/          -> `Scene`インターフェイスとサンプル実装
-  utils/           -> イージングやノイズなどの共有関数
+  shaders/         -> Vite で直接読み込む GLSL 資産
+  types/           -> 共通の型定義
+  utils/
+    animation/     -> 画像アニメーション関連ユーティリティ
+    color/         -> カラーパレット定義
+    debug/         -> ログ収集などデバッグ補助
+    math/          -> イージングやノイズ、マッピング関数
+    rhythm/        -> BPM やテンポ同期ヘルパー
+    text/          -> 文字描画・判定ユーティリティ
 ```
 
 ## シーンと描画フロー
@@ -71,8 +78,11 @@ src/
 
 ## テンプレート拡張のヒント
 - `src/scenes/`にシーンを追加する、`src/midi/apcmini_mk2/`で`APCMiniMK2Base`を継承したパターンを作るなど、用途に応じてモジュールを増やせます。
-- `BPMManager`と`src/utils/easing.ts`のイージングを組み合わせ、テンポに合わせたアニメーションを構築できます。
+- `BPMManager`と`src/utils/math/easing.ts`のイージングを組み合わせ、テンポに合わせたアニメーションを構築できます。
 - `public/`フォルダー内のサンプルアセットを差し替え、自分のフォントやテクスチャで演出を強化してください。
+
+## 開発ガイドライン
+- プロジェクト全体の命名方針は `docs/naming-conventions.md` にまとめています。新しいファイルや型を追加する際は事前に確認してください。
 
 ## トラブルシューティング
 - **MIDIデバイスが認識されない**: Web MIDIはHTTPSまたは`localhost`でのみ動作します。ChromeなどでMIDI許可ダイアログを確認し、APC Mini MK2を接続した状態でページを開いてください。

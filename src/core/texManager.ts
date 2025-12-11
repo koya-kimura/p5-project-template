@@ -2,11 +2,11 @@ import p5 from "p5";
 
 // TexManager は描画用の p5.Graphics とシーン、MIDI デバッグ描画のハブを担当する。
 export class TexManager {
-  private renderTexture: p5.Graphics | null;
+  private renderTexture: p5.Graphics | undefined;
 
   // コンストラクタではデバッグ用シーン管理と MIDI ハンドラをセットアップする。
   constructor() {
-    this.renderTexture = null;
+    this.renderTexture = undefined;
   }
 
   // init はキャンバスサイズに合わせた描画用 Graphics を初期化する。

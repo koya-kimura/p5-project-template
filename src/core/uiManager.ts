@@ -1,19 +1,13 @@
 import p5 from "p5";
 import { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
+import type { UIAssets } from "../types";
 
-type UIDrawFunction = (
-  p: p5,
-  tex: p5.Graphics,
-  font: p5.Font,
-  logo: p5.Image | undefined,
-  beat: number,
-) => void;
+type UIDrawFunction = (p: p5, tex: p5.Graphics, assets: UIAssets, beat: number) => void;
 
 const uiNone: UIDrawFunction = (
   _p: p5,
   tex: p5.Graphics,
-  _font: p5.Font,
-  _logo: p5.Image | undefined,
+  _assets: UIAssets,
   _beat: number,
 ): void => {
   tex.push();
@@ -23,12 +17,11 @@ const uiNone: UIDrawFunction = (
 const uiDraw01: UIDrawFunction = (
   p: p5,
   tex: p5.Graphics,
-  font: p5.Font,
-  _logo: p5.Image | undefined,
+  assets: UIAssets,
   _beat: number,
 ): void => {
   tex.push();
-  tex.textFont(font);
+  tex.textFont(assets.font);
   tex.textSize(32);
   tex.fill(255);
   tex.textAlign(p.CENTER, p.CENTER);
@@ -124,10 +117,9 @@ export class UIManager {
    * 他の描画処理への影響を防ぎつつ、クリーンな状態でUIを描画します。
    *
    * @param p p5.jsのインスタンス。
-   * @param font UI描画に使用するフォント。
-   * @param resources その他の描画に必要なリソース群（BPM、ビート、カラーパレットなど）。
+   * @param assets UI描画に使用するフォントやロゴなどのリソース。
    */
-  draw(p: p5, midiManager: APCMiniMK2Manager, font: p5.Font, logo: p5.Image | undefined): void {
+  draw(p: p5, midiManager: APCMiniMK2Manager, assets: UIAssets): void {
     const texture = this.renderTexture;
     if (!texture) {
       throw new Error("Texture not initialized");
@@ -140,7 +132,7 @@ export class UIManager {
     texture.push();
     texture.clear();
     const drawer = UI_DRAWERS[this.activePatternIndex] ?? UI_DRAWERS[0];
-    drawer(p, texture, font, logo, p.millis() / 500);
+    drawer(p, texture, assets, p.millis() / 500);
 
     texture.pop();
   }

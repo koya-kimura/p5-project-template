@@ -1,5 +1,6 @@
 import { MIDIManager } from "../midiManager";
-import { UniformRandom } from "../../utils/uniformRandom";
+import { UniformRandom } from "../../utils/math/UniformRandom";
+import type { ButtonConfig, FaderButtonMode, InputType, MidiInputValue } from "../../types";
 import {
   MIDI_BUTTON_CONFIGS,
   FADER_BUTTON_MODE,
@@ -13,38 +14,6 @@ import { LED_PALETTE, PAGE_LED_PALETTE } from "./ledPalette";
 // 型定義
 // ========================================
 
-type FaderButtonMode = "mute" | "random";
-
-/** ボタンの入力タイプ */
-export type InputType = "radio" | "toggle" | "oneshot" | "momentary" | "random" | "sequence";
-
-/** セルの位置指定 */
-export interface CellPosition {
-  page?: number; // デフォルト: 0
-  row: number; // 0=上, 7=下
-  col: number; // 0=左, 7=右
-}
-
-/** ボタン設定 */
-export interface ButtonConfig {
-  key: string; // アクセスキー: midiInput["key"]
-  type: InputType; // 入力タイプ
-  cells: CellPosition[]; // 対象セル
-  activeColor?: number; // アクティブ時のLED色
-  inactiveColor?: number; // 非アクティブ時のLED色
-  defaultValue?: number | boolean;
-
-  // randomタイプ専用オプション
-  randomTarget?: string; // ランダム対象のradioボタンのkey
-  excludeCurrent?: boolean; // 現在値を除外するか（デフォルト: true）
-  speed?: number; // ランダム/シーケンス切り替えのスピード倍率（デフォルト: 1）
-
-  // sequenceタイプ専用オプション
-  initialPattern?: boolean[]; // 初期パターン（セル数に合わせた配列）
-  onColor?: number; // ONセルのLED色
-  offColor?: number; // OFFセルのLED色
-}
-
 /** 内部管理用: 登録されたセル情報 */
 interface RegisteredCell {
   key: string;
@@ -53,9 +22,6 @@ interface RegisteredCell {
   activeColor: number;
   inactiveColor: number;
 }
-
-/** MIDI入力値の型 */
-export type MidiInputValue = number | boolean;
 
 // ========================================
 // 定数

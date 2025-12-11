@@ -4,9 +4,10 @@
  * MIDIデバイスの管理を行う基底クラス
  */
 export class MIDIManager {
-  private midiOutput: WebMidi.MIDIOutput | null = null;
-  public onMidiMessageCallback: ((message: WebMidi.MIDIMessageEvent) => void) | null = null;
-  private initPromise: Promise<void> | null = null;
+  private midiOutput: WebMidi.MIDIOutput | undefined = undefined;
+  public onMidiMessageCallback: ((message: WebMidi.MIDIMessageEvent) => void) | undefined =
+    undefined;
+  private initPromise: Promise<void> | undefined = undefined;
   protected midiAvailable: boolean = false;
 
   /**

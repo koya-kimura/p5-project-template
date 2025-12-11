@@ -4,7 +4,7 @@ import p5 from "p5";
 import { TexManager } from "./core/texManager";
 import { EffectManager } from "./core/effectManager";
 import { UIManager } from "./core/uiManager";
-import { BPMManager } from "./utils/BPMManager";
+import { BPMManager } from "./utils/rhythm/BPMManager";
 import { APCMiniMK2Manager } from "./midi/apcmini_mk2/APCMiniMK2Manager";
 
 // シェーダーを import（vite-plugin-glsl により文字列として読み込まれる）
@@ -45,7 +45,14 @@ const sketch = (p: p5) => {
     texManager.update(p);
     texManager.draw(p);
 
-    uiManager.draw(p, midiManager, font!, logo!);
+    if (font && logo) {
+      uiManager.draw(p, midiManager, { font, logo });
+    } else {
+      const uiTexture = uiManager.getTexture();
+      uiTexture.push();
+      uiTexture.clear();
+      uiTexture.pop();
+    }
 
     effectManager.apply(
       p,

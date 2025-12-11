@@ -2,8 +2,7 @@
  * MIDI設定ファイル
  * APC Mini MK2のボタン・セルの設定を定義します。
  */
-
-import type { ButtonConfig } from "./APCMiniMK2Manager";
+import type { ButtonConfig, FaderButtonMode } from "../../types";
 import { LED_PALETTE } from "./ledPalette";
 
 // ========================================
@@ -215,7 +214,7 @@ export const MIDI_BUTTON_CONFIGS: ButtonConfig[] = [
  * - "mute": フェーダーボタンON時、フェーダー値を0にミュート
  * - "random": フェーダーボタンON時、フェーダー値をBPM同期でランダムに0/1切り替え
  */
-export const FADER_BUTTON_MODE: "mute" | "random" = "random";
+export const FADER_BUTTON_MODE: FaderButtonMode = "random";
 
 // ========================================
 // デフォルト値設定
