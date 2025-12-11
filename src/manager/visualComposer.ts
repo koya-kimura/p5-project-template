@@ -1,7 +1,7 @@
 import p5 from "p5";
-import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
-import type { AudioMicManager } from "../audio/AudioMicManager";
-import type { CaptureManager } from "../capture/CaptureManager";
+import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
+import type { AudioMicManager } from "../utils/audio/audioMicManager";
+import type { CaptureManager } from "../utils/capture/captureManager";
 import { DebugScreen } from "../visuals/debugScreen";
 
 export interface VisualRenderContext {
@@ -51,8 +51,7 @@ export class VisualComposer {
     _audioManager?: AudioMicManager,
     _captureManager?: CaptureManager,
     _font?: p5.Font,
-  ): void {
-  }
+  ): void {}
 
   draw(
     p: p5,
@@ -85,6 +84,7 @@ export class VisualComposer {
   }
 
   dispose(): void {
+    this.debugScreen.dispose?.();
     this.renderTexture?.remove();
     this.renderTexture = undefined;
   }

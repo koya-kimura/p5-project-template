@@ -136,7 +136,7 @@ export class AudioMicManager {
       return 0;
     }
 
-    return (sum / count) / 255;
+    return sum / count / 255;
   }
 
   /**

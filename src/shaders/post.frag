@@ -1,3 +1,11 @@
+// Post-processing fragment shader
+// Applies effects to the rendered visual texture
+// Uniforms:
+// - u_tex: sampler2D, the visual texture
+// - u_resolution: vec2, screen resolution
+// - u_time: float, elapsed time in seconds
+// - u_beat: float, current beat value
+
 precision mediump float;
 
 varying vec2 vTexCoord;

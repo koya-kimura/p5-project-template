@@ -1,5 +1,12 @@
 {
-  "name": "tutorial",
+  "name": "p5-project-template",
+  "description": "A p5.js-based template for interactive visuals with MIDI, audio, and camera support",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/p5-project-template.git"
+  },
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -30,7 +37,6 @@
   },
   "dependencies": {
     "glslify-import": "^3.1.0",
-    "p5": "^2.0.5",
-    "p5.sound": "^0.2.0"
+    "p5": "^2.0.5"
   }
 }

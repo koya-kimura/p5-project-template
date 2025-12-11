@@ -12,9 +12,7 @@ export default defineConfig({
   },
   plugins: [
     glsl({
-      include: /\.(glsl|vert|frag)(\?[\s\S]*)?$/i, // クエリ付き拡張子にもマッチさせる
-      compress: false,  // 可読性を保持
-      watch: true,      // ファイル変更を監視
+      include: ['**/*.glsl', '**/*.vert', '**/*.frag'], // クエリ付き拡張子にもマッチさせる
     }),
   ],
   build: {

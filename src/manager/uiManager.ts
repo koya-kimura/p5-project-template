@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
+import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
 import type { UIAssets } from "../types";
 
 type UIDrawFunction = (p: p5, tex: p5.Graphics, assets: UIAssets, beat: number) => void;

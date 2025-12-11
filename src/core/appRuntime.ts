@@ -1,11 +1,11 @@
 import p5 from "p5";
-import { VisualComposer } from "./visualComposer";
-import { EffectManager } from "./effectManager";
-import { UIManager } from "./uiManager";
-import { BPMManager } from "../utils/rhythm/BPMManager";
-import { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
-import { AudioMicManager } from "../audio/AudioMicManager";
-import { CaptureManager } from "../capture/CaptureManager";
+import { VisualComposer } from "../manager/visualComposer";
+import { EffectManager } from "../manager/effectManager";
+import { UIManager } from "../manager/uiManager";
+import { BPMManager } from "../utils/rhythm/bpmManager";
+import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
+import { AudioMicManager } from "../utils/audio/audioMicManager";
+import { CaptureManager } from "../utils/capture/captureManager";
 import type { AppConfig } from "./appConfig";
 import { defaultAppConfig } from "./appConfig";
 import mainVert from "../shaders/main.vert";
@@ -101,32 +101,40 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
   return {
     async initialize(p: p5): Promise<void> {
-      visualComposer.init(p);
-      uiManager.init(p);
-      midiManager.init();
+      try {
+        visualComposer.init(p);
+        uiManager.init(p);
+        midiManager.init();
 
-      effectManager.load(p, mainVert, postFrag);
+        effectManager.load(p, mainVert, postFrag);
 
-      const tasks: Promise<void>[] = [loadAssets(p)];
+        const tasks: Promise<void>[] = [loadAssets(p)];
 
-      if (audioManager) {
-        tasks.push(
-          audioManager.init().catch((error) => {
-            console.error("Microphone initialization failed", error);
-          }),
-        );
+        if (audioManager) {
+          tasks.push(
+            audioManager.init().catch((error) => {
+              console.error("Microphone initialization failed", error);
+              alert("Microphone access failed. Audio features will be disabled.");
+            }),
+          );
+        }
+
+        if (captureManager) {
+          tasks.push(
+            captureManager.init(p).catch((error) => {
+              console.error("Capture initialization failed", error);
+              alert("Camera access failed. Capture features will be disabled.");
+            }),
+          );
+        }
+
+        await Promise.all(tasks);
+        initialized = true;
+      } catch (error) {
+        console.error("Runtime initialization failed", error);
+        alert("Application initialization failed. Please refresh the page.");
+        throw error;
       }
-
-      if (captureManager) {
-        tasks.push(
-          captureManager.init(p).catch((error) => {
-            console.error("Capture initialization failed", error);
-          }),
-        );
-      }
-
-      await Promise.all(tasks);
-      initialized = true;
     },
 
     drawFrame(p: p5): void {
@@ -156,7 +164,13 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
         uiTexture.pop();
       }
 
-      effectManager.apply(p, midiManager, beat, visualComposer.getTexture(), uiManager.getTexture());
+      effectManager.apply(
+        p,
+        midiManager,
+        beat,
+        visualComposer.getTexture(),
+        uiManager.getTexture(),
+      );
     },
 
     handleResize(p: p5): void {

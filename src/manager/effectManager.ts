@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
+import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager";
 
 /**
  * EffectManager はポストエフェクト用のシェーダーを読み込み、描画パイプラインへ適用する。
@@ -19,7 +19,16 @@ export class EffectManager {
    * @param fragSource フラグメントシェーダーの GLSL ソース文字列。
    */
   load(p: p5, vertSource: string, fragSource: string): void {
-    this.shader = p.createShader(vertSource, fragSource);
+    try {
+      this.shader = p.createShader(vertSource, fragSource);
+      if (!this.shader) {
+        throw new Error("Shader creation failed");
+      }
+    } catch (error) {
+      console.error("Shader loading failed", error);
+      alert("Shader compilation failed. Effects will be disabled.");
+      this.shader = undefined;
+    }
   }
 
   /**
@@ -39,14 +48,24 @@ export class EffectManager {
     _uiTexture: p5.Graphics,
   ): void {
     if (!this.shader) {
+      // Fallback: draw texture directly without shader
+      p.image(sourceTexture, 0, 0, p.width, p.height);
       return;
     }
 
-    p.shader(this.shader);
-    this.shader.setUniform("u_tex", sourceTexture);
-    this.shader.setUniform("u_resolution", [p.width, p.height]);
-    this.shader.setUniform("u_time", p.millis() / 1000.0);
-    this.shader.setUniform("u_beat", beat);
-    p.rect(0, 0, p.width, p.height);
+    try {
+      p.shader(this.shader);
+      this.shader.setUniform("u_tex", sourceTexture);
+      this.shader.setUniform("u_resolution", [p.width, p.height]);
+      this.shader.setUniform("u_time", p.millis() / 1000.0);
+      this.shader.setUniform("u_beat", beat);
+      p.rect(0, 0, p.width, p.height);
+      p.resetShader(); // Reset to avoid affecting subsequent draws
+    } catch (error) {
+      console.error("Shader application failed", error);
+      // Fallback to direct texture draw
+      p.resetShader();
+      p.image(sourceTexture, 0, 0, p.width, p.height);
+    }
   }
 }

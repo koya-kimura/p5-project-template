@@ -1,3 +1,7 @@
+// Utility functions for GLSL shaders
+// Includes common math functions, random generation, color conversions, etc.
+// Used by post.frag and other shaders
+
 float PI = 3.14159265358979;
 
 float random(vec2 st){

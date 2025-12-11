@@ -1,5 +1,5 @@
 import { MIDIManager } from "../midiManager";
-import { UniformRandom } from "../../utils/math/UniformRandom";
+import { UniformRandom } from "../../utils/math/uniformRandom";
 import type { ButtonConfig, FaderButtonMode, InputType, MidiInputValue } from "../../types";
 import {
   MIDI_BUTTON_CONFIGS,
