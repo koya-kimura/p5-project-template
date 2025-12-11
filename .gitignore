@@ -23,4 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
+# 個人用メモとTODOファイル
 memo.md
+TODO.md

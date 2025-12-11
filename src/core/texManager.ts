@@ -1,21 +1,12 @@
 import p5 from "p5";
 
-import type { Scene } from "../scenes/Scene";
-import { APCMiniMK2SceneMatrix } from "../midi/apcmini_mk2/APCMiniMK2SceneMatrix";
-import { SampleScene } from "../scenes/sampleScene";
-
 // TexManager は描画用の p5.Graphics とシーン、MIDI デバッグ描画のハブを担当する。
 export class TexManager {
     private renderTexture: p5.Graphics | null;
-    private readonly midiSceneMatrix: APCMiniMK2SceneMatrix;
-    private readonly scenes: Scene[];
-    private activeSceneIndex = 0;
 
     // コンストラクタではデバッグ用シーン管理と MIDI ハンドラをセットアップする。
     constructor() {
         this.renderTexture = null;
-        this.midiSceneMatrix = new APCMiniMK2SceneMatrix();
-        this.scenes = [new SampleScene()];
     }
 
     // init はキャンバスサイズに合わせた描画用 Graphics を初期化する。
@@ -43,9 +34,6 @@ export class TexManager {
 
     // update はシーンの更新前に MIDI 状態を反映させる。
     update(p: p5): void {
-        this.midiSceneMatrix.update();
-        const currentScene = this.scenes[this.activeSceneIndex];
-        currentScene.update(p);
     }
 
     // draw はシーン描画と MIDI デバッグオーバーレイを Graphics 上にまとめて描画する。
@@ -56,9 +44,9 @@ export class TexManager {
         }
 
         texture.push();
-        const currentScene = this.scenes[this.activeSceneIndex];
-        currentScene.draw(p, texture);
-        this.midiSceneMatrix.drawDebug(p, texture);
+        texture.clear();
+        texture.background(255, 0, 0);
+        texture.circle(texture.width / 2, texture.height / 2, 100);
         texture.pop();
     }
 }

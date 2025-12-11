@@ -3,22 +3,38 @@ import p5 from "p5";
 
 import { TexManager } from "./core/texManager";
 import { EffectManager } from "./core/effectManager";
+import { UIManager } from "./core/uiManager";
+import { BPMManager } from "./utils/BPMManager";
+import { APCMiniMK2Manager } from "./midi/apcmini_mk2/APCMiniMK2Manager";
 
 const texManager = new TexManager();
 const effectManager = new EffectManager();
+const bpmManager = new BPMManager();
+const midiManager = new APCMiniMK2Manager();
+const uiManager = new UIManager();
+
+let logo: p5.Image | undefined;
+let font: p5.Font | undefined;
 
 // sketch は p5 インスタンスモードで実行されるエントリー関数。
 const sketch = (p: p5) => {
   // setup は一度だけ呼ばれ、レンダーターゲットとシェーダーを初期化する。
   p.setup = async () => {
     p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
+    p.noCursor();
+
     texManager.init(p);
+    uiManager.init(p);
+    midiManager.init();
 
     await effectManager.load(
       p,
-      "/shader/post.vert",
-      "/shader/post.frag",
+      "/shader/dist/main.vert",
+      "/shader/dist/post.frag",
     );
+
+    logo = await p.loadImage("/image/logo/kimura.png");
+    font = await p.loadFont("/font/Jost-Regular.ttf");
   };
 
   // draw は毎フレームのループでシーン更新とポストエフェクトを適用する。
@@ -28,7 +44,9 @@ const sketch = (p: p5) => {
     texManager.update(p);
     texManager.draw(p);
 
-    effectManager.apply(p, texManager.getTexture());
+    uiManager.draw(p, midiManager, font!, logo!);
+
+    effectManager.apply(p, midiManager, bpmManager.getBeat(), texManager.getTexture(), uiManager.getTexture());
   };
 
   // windowResized はブラウザのリサイズに追従してバッファを更新する。
