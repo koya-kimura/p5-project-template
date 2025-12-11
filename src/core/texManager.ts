@@ -1,17 +1,21 @@
 import p5 from "p5";
+import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
+import { PlaceholderScene } from "../scenes/placeholderScene";
 
-// TexManager は描画用の p5.Graphics とシーン、MIDI デバッグ描画のハブを担当する。
+// TexManager はレンダーターゲットとシーン描画をまとめるハブ。
 export class TexManager {
   private renderTexture: p5.Graphics | undefined;
+  private readonly mainScene: PlaceholderScene;
 
-  // コンストラクタではデバッグ用シーン管理と MIDI ハンドラをセットアップする。
   constructor() {
     this.renderTexture = undefined;
+    this.mainScene = new PlaceholderScene();
   }
 
-  // init はキャンバスサイズに合わせた描画用 Graphics を初期化する。
+  // init はキャンバスサイズに合わせた描画用 Graphics を初期化し、シーンへ通知する。
   init(p: p5): void {
     this.renderTexture = p.createGraphics(p.width, p.height);
+    this.mainScene.init(p);
   }
 
   // getTexture は初期化済みの描画バッファを返し、未初期化時はエラーとする。
@@ -23,29 +27,25 @@ export class TexManager {
     return texture;
   }
 
-  // resize は現在の Graphics を最新のウィンドウサイズに追従させる。
+  // resize は現在の Graphics を最新のウィンドウサイズに追従させ、シーンへも伝える。
   resize(p: p5): void {
     const texture = this.renderTexture;
     if (!texture) {
       throw new Error("Texture not initialized");
     }
     texture.resizeCanvas(p.width, p.height);
+    this.mainScene.resize(p);
   }
 
-  // update はシーンの更新前に MIDI 状態を反映させる。
-  update(_p: p5): void {}
+  update(p: p5, midiManager: APCMiniMK2Manager, beat: number): void {
+    this.mainScene.update(p, midiManager, beat);
+  }
 
-  // draw はシーン描画と MIDI デバッグオーバーレイを Graphics 上にまとめて描画する。
-  draw(_p: p5): void {
+  draw(p: p5, midiManager: APCMiniMK2Manager, beat: number): void {
     const texture = this.renderTexture;
     if (!texture) {
       throw new Error("Texture not initialized");
     }
-
-    texture.push();
-    texture.clear();
-    texture.background(255, 0, 0);
-    texture.circle(texture.width / 2, texture.height / 2, 100);
-    texture.pop();
+    this.mainScene.draw(p, texture, midiManager, beat);
   }
 }

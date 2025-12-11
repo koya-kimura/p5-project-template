@@ -35,6 +35,10 @@ p5.js（インスタンスモード）とWebGLポストエフェクト、APC Min
 public/
   shader/          -> ポストプロセス用の頂点・フラグメントシェーダー
   font|icon|image/ -> アセット格納用のプレースホルダー
+config/
+  eslint.config.js -> ESLint フラット構成本体
+  prettier.config.js -> Prettier 設定
+  .prettierignore  -> Prettier 対象外パス
 src/
   main.ts          -> p5エントリーポイント（インスタンスモードのセットアップとループ）
   core/
@@ -56,13 +60,12 @@ src/
 ```
 
 ## シーンと描画フロー
-- `Scene`インターフェイス（`src/scenes/Scene.ts`）は`update(p)`と`draw(p, graphics)`を定義し、各シーンがロジック更新と共有`p5.Graphics`への描画を切り分けられます。
-- `TexManager`はアクティブシーンの更新・描画を管理し、MIDI更新を受け取ってデバッグオーバーレイをレンダーテクスチャへ合成します。
-- `EffectManager`はポストシェーダーをアクティブ化し、`u_tex``u_resolution``u_time`のUniformを渡して画面へフルスクリーン描画します。
+- `TexManager` は `src/scenes/placeholderScene.ts` を通じてレンダーテクスチャへ描画し、MIDI フェーダーやビートに反応する図形を生成します。
+- `EffectManager` はポストシェーダーをアクティブ化し、`u_tex``u_resolution``u_time` の Uniform を渡してフルスクリーン描画を行います。
 - 新しいシーンを追加する手順：
-  1. `Scene`を実装したクラスを`src/scenes/`に作成。
-  2. `TexManager`の`scenes`配列にインスタンスを追加し、必要なら切り替えロジックを用意。
-  3. APC Mini MK2のコールバックや独自処理で`activeSceneIndex`を切り替える。
+  1. `src/scenes/` に `init/update/draw` メソッドを持つクラスを追加する。
+  2. `TexManager` 内で新しいシーンクラスをインスタンス化し、`update` と `draw` から呼び出すようにする。
+  3. 必要に応じて MIDI 入力や BPM 値を受け渡す。
 
 ## APC Mini MK2のワークフロー
 - グリッドパッドはシーンごとのラジオセレクターとして動作し、各列に最大8段のパラメーター選択肢を割り当てます。最下段はその列をランダムモードに切り替えます。

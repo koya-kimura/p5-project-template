@@ -3,6 +3,7 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettierPlugin from 'eslint-plugin-prettier';
 import globals from 'globals';
+import prettierConfig from './prettier.config.js';
 
 const baseConfig = js.configs.recommended;
 const tsRecommendedRules = tsPlugin.configs.recommended.rules;
@@ -32,7 +33,7 @@ export default [
     rules: {
       ...baseConfig.rules,
       ...tsRecommendedRules,
-      'prettier/prettier': 'warn',
+      'prettier/prettier': ['warn', prettierConfig],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {

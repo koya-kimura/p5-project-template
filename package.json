@@ -8,10 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "npm run lint -- --fix",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\""
+    "lint": "eslint --config config/eslint.config.js src --ext .ts",
+    "lint:fix": "eslint --config config/eslint.config.js src --ext .ts --fix",
+    "format": "prettier --config config/prettier.config.js --ignore-path config/.prettierignore --write \"src/**/*.ts\"",
+    "format:check": "prettier --config config/prettier.config.js --ignore-path config/.prettierignore --check \"src/**/*.ts\""
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

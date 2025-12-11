@@ -42,8 +42,10 @@ const sketch = (p: p5) => {
   p.draw = () => {
     p.background(0);
 
-    texManager.update(p);
-    texManager.draw(p);
+    const beat = bpmManager.getBeat();
+
+    texManager.update(p, midiManager, beat);
+    texManager.draw(p, midiManager, beat);
 
     if (font && logo) {
       uiManager.draw(p, midiManager, { font, logo });
@@ -54,13 +56,7 @@ const sketch = (p: p5) => {
       uiTexture.pop();
     }
 
-    effectManager.apply(
-      p,
-      midiManager,
-      bpmManager.getBeat(),
-      texManager.getTexture(),
-      uiManager.getTexture(),
-    );
+    effectManager.apply(p, midiManager, beat, texManager.getTexture(), uiManager.getTexture());
   };
 
   // windowResized はブラウザのリサイズに追従してバッファを更新する。
