@@ -1,5 +1,5 @@
 /**
- * AudioMicManager はブラウザのマイク入力から音量と周波数データを取得する。
+ * AudioMicManager はブラウザのマイク入力から音量と周波数スペクトラムを取得する。
  */
 export class AudioMicManager {
   private audioContext: AudioContext | undefined;
@@ -9,6 +9,9 @@ export class AudioMicManager {
   private volume = 0;
   private isInitialized = false;
 
+  /**
+   * マイク入力の利用許可を取得し、`AnalyserNode` で解析できる状態にする。
+   */
   async init(): Promise<void> {
     if (this.isInitialized) {
       return;
@@ -40,12 +43,18 @@ export class AudioMicManager {
     this.isInitialized = true;
   }
 
+  /**
+   * AudioContext がサスペンドされている場合に再開する。
+   */
   async resume(): Promise<void> {
     if (this.audioContext && this.audioContext.state === "suspended") {
       await this.audioContext.resume();
     }
   }
 
+  /**
+   * 現在の音声波形を取得し、ボリューム値を算出する。
+   */
   update(): void {
     if (!this.analyser || !this.timeDomainData || !this.frequencyData) {
       return;
@@ -62,12 +71,19 @@ export class AudioMicManager {
     this.volume = Math.sqrt(sumSquares / this.timeDomainData.length);
   }
 
+  /**
+   * ルート平均二乗 (RMS) を元に計算した音量値を返す。
+   *
+   * @returns 0.0〜1.0 程度の正規化された音量。
+   */
   getVolume(): number {
     return this.volume;
   }
 
   /**
-   * 周波数データのコピーを返す。未初期化の場合は空配列。
+   * 周波数領域の強度配列をコピーで返す。
+   *
+   * @returns 0〜255 の値を持つ周波数データ。
    */
   getFrequencyData(): Uint8Array {
     if (!this.frequencyData) {
@@ -76,6 +92,9 @@ export class AudioMicManager {
     return new Uint8Array(this.frequencyData);
   }
 
+  /**
+   * AudioContext と MediaStream を解放し、再初期化可能な状態へ戻す。
+   */
   dispose(): void {
     this.analyser?.disconnect();
     if (this.audioContext && this.audioContext.state !== "closed") {

@@ -2,8 +2,12 @@ import p5 from "p5";
 import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
 import type { AudioMicManager } from "../audio/AudioMicManager";
 import { PlaceholderScene } from "../scenes/placeholderScene";
+import type { CaptureManager } from "../capture/CaptureManager";
 
-// TexManager はレンダーターゲットとシーン描画をまとめるハブ。
+/**
+ * TexManager はレンダーターゲット（オフスクリーンの p5.Graphics）を生成し、
+ * シーン描画とポストエフェクトの橋渡しを担う。
+ */
 export class TexManager {
   private renderTexture: p5.Graphics | undefined;
   private readonly mainScene: PlaceholderScene;
@@ -13,13 +17,22 @@ export class TexManager {
     this.mainScene = new PlaceholderScene();
   }
 
-  // init はキャンバスサイズに合わせた描画用 Graphics を初期化し、シーンへ通知する。
+  /**
+   * レンダリング用のオフスクリーンバッファを生成し、シーンへ初期化イベントを伝える。
+   *
+   * @param p p5 インスタンス。
+   */
   init(p: p5): void {
     this.renderTexture = p.createGraphics(p.width, p.height);
     this.mainScene.init(p);
   }
 
-  // getTexture は初期化済みの描画バッファを返し、未初期化時はエラーとする。
+  /**
+   * 初期化済みの描画バッファを返す。
+   *
+   * @returns シーン描画結果が格納された `p5.Graphics`。
+   * @throws Error 初期化前に呼び出された場合。
+   */
   getTexture(): p5.Graphics {
     const texture = this.renderTexture;
     if (!texture) {
@@ -28,7 +41,11 @@ export class TexManager {
     return texture;
   }
 
-  // resize は現在の Graphics を最新のウィンドウサイズに追従させ、シーンへも伝える。
+  /**
+   * 現在のレンダーバッファを最新のキャンバスサイズへリサイズし、シーンへも通知する。
+   *
+   * @param p p5 インスタンス。
+   */
   resize(p: p5): void {
     const texture = this.renderTexture;
     if (!texture) {
@@ -38,15 +55,45 @@ export class TexManager {
     this.mainScene.resize(p);
   }
 
-  update(p: p5, midiManager: APCMiniMK2Manager, audioManager: AudioMicManager, beat: number): void {
-    this.mainScene.update(p, midiManager, audioManager, beat);
+  /**
+   * シーンの更新処理を委譲する。Audio/Capture が無効な場合は `undefined` を渡す。
+   *
+   * @param p p5 インスタンス。
+   * @param midiManager APC Mini MK2 の入力状態。
+   * @param beat BPMManager が算出したビート値。
+   * @param audioManager オプションのマイク入力マネージャ。
+   * @param captureManager オプションのカメラキャプチャマネージャ。
+   */
+  update(
+    p: p5,
+    midiManager: APCMiniMK2Manager,
+    beat: number,
+    audioManager?: AudioMicManager,
+    captureManager?: CaptureManager,
+  ): void {
+    this.mainScene.update(p, midiManager, beat, audioManager, captureManager);
   }
 
-  draw(p: p5, midiManager: APCMiniMK2Manager, audioManager: AudioMicManager, beat: number): void {
+  /**
+   * レンダーテクスチャへシーンを描画する。
+   *
+   * @param p p5 インスタンス。
+   * @param midiManager APC Mini MK2 の入力状態。
+   * @param beat BPMManager が算出したビート値。
+   * @param audioManager オプションのマイク入力マネージャ。
+   * @param captureManager オプションのカメラキャプチャマネージャ。
+   */
+  draw(
+    p: p5,
+    midiManager: APCMiniMK2Manager,
+    beat: number,
+    audioManager?: AudioMicManager,
+    captureManager?: CaptureManager,
+  ): void {
     const texture = this.renderTexture;
     if (!texture) {
       throw new Error("Texture not initialized");
     }
-    this.mainScene.draw(p, texture, midiManager, audioManager, beat);
+    this.mainScene.draw(p, texture, midiManager, beat, audioManager, captureManager);
   }
 }

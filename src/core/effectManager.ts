@@ -1,22 +1,36 @@
-// EffectManager はポストエフェクト用のシェーダーを読み込み適用する責務を持つ。
 import p5 from "p5";
 import { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
 
+/**
+ * EffectManager はポストエフェクト用のシェーダーを読み込み、描画パイプラインへ適用する。
+ */
 export class EffectManager {
   private shader: p5.Shader | undefined;
 
-  // constructor は空のシェーダー参照を初期化する。
   constructor() {
     this.shader = undefined;
   }
 
-  // load はシェーダーソース文字列から p5.Shader を生成して保持する。
-  // vite-plugin-glsl により import されたシェーダー文字列を直接受け取る。
+  /**
+   * シェーダーソースから `p5.Shader` を生成し、以降の描画で利用できるよう保持する。
+   *
+   * @param p p5 インスタンス。
+   * @param vertSource 頂点シェーダーの GLSL ソース文字列。
+   * @param fragSource フラグメントシェーダーの GLSL ソース文字列。
+   */
   load(p: p5, vertSource: string, fragSource: string): void {
     this.shader = p.createShader(vertSource, fragSource);
   }
 
-  // apply は保持しているシェーダーをアクティブにし、各種 Uniform を設定して描画する。
+  /**
+   * 保持しているシェーダーをアクティブ化し、Uniform を設定した上でフルスクリーンポリゴンを描画する。
+   *
+   * @param p p5 インスタンス。
+   * @param _midiManager MIDI 状態（将来的な Uniform 連携向け）。
+   * @param beat 現在のビート値。
+   * @param sourceTexture シーンが描画されたレンダーテクスチャ。
+   * @param _uiTexture UI オーバーレイ（未使用だが将来的に活用予定）。
+   */
   apply(
     p: p5,
     _midiManager: APCMiniMK2Manager,
