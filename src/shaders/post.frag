@@ -7,7 +7,9 @@ uniform sampler2D u_tex;
 uniform sampler2D ui_tex;
 
 // Bundled at build time via vite-plugin-glsl; VS Code warnings are expected.
-#include "./utils/util.frag"
+#include "./utils/math.frag"
+#include "./utils/coord.frag"
+#include "./utils/color.frag"
 
 void main(void) {
     vec2 uv = vTexCoord;
