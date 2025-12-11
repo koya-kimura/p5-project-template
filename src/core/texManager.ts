@@ -1,7 +1,7 @@
 import p5 from "p5";
 import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
 import type { AudioMicManager } from "../audio/AudioMicManager";
-import { PlaceholderScene } from "../scenes/placeholderScene";
+import type { VisualScene } from "../scenes/types";
 import type { CaptureManager } from "../capture/CaptureManager";
 
 /**
@@ -10,11 +10,11 @@ import type { CaptureManager } from "../capture/CaptureManager";
  */
 export class TexManager {
   private renderTexture: p5.Graphics | undefined;
-  private readonly mainScene: PlaceholderScene;
+  private mainScene: VisualScene;
 
-  constructor() {
+  constructor(initialScene: VisualScene) {
     this.renderTexture = undefined;
-    this.mainScene = new PlaceholderScene();
+    this.mainScene = initialScene;
   }
 
   /**
@@ -53,6 +53,19 @@ export class TexManager {
     }
     texture.resizeCanvas(p.width, p.height);
     this.mainScene.resize(p);
+  }
+
+  /**
+   * 現在のシーンを差し替える。必要であればその場で初期化する。
+   *
+   * @param scene 新しいシーン。
+   * @param p すでに初期化済みの場合は p5 インスタンスを渡すと即座に init を呼び出す。
+   */
+  setScene(scene: VisualScene, p?: p5): void {
+    this.mainScene = scene;
+    if (p && this.renderTexture) {
+      scene.init(p);
+    }
   }
 
   /**

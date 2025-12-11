@@ -8,6 +8,8 @@ import { AudioMicManager } from "../audio/AudioMicManager";
 import { CaptureManager } from "../capture/CaptureManager";
 import type { AppConfig } from "./appConfig";
 import { defaultAppConfig } from "./appConfig";
+import { PlaceholderScene } from "../scenes/debugScreen";
+import type { VisualScene } from "../scenes/types";
 import mainVert from "../shaders/main.vert";
 import postFrag from "../shaders/post.frag";
 
@@ -29,6 +31,7 @@ export interface AppContext {
   readonly uiManager: UIManager;
   readonly bpmManager: BPMManager;
   readonly midiManager: APCMiniMK2Manager;
+  scene: VisualScene;
   audioManager?: AudioMicManager;
   captureManager?: CaptureManager;
   assets: RuntimeAssets;
@@ -52,6 +55,8 @@ export interface AppRuntime {
   dispose(): void;
   /** 現在のコンテキスト参照を取得。 */
   getContext(): AppContext;
+  /** シーン差し替え。初期化済みの場合は即座に `init` を呼び出す。 */
+  setScene(scene: VisualScene, p?: p5): void;
 }
 
 /**
@@ -64,7 +69,9 @@ export interface AppRuntime {
 export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
   const resolvedConfig: AppConfig = { ...defaultAppConfig, ...config };
 
-  const texManager = new TexManager();
+  const createScene = resolvedConfig.createScene ?? (() => new PlaceholderScene());
+  const scene = createScene();
+  const texManager = new TexManager(scene);
   const effectManager = new EffectManager();
   const uiManager = new UIManager();
   const bpmManager = new BPMManager();
@@ -79,6 +86,7 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
     uiManager,
     bpmManager,
     midiManager,
+    scene,
     audioManager,
     captureManager,
     assets: {},
@@ -182,6 +190,11 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
 
     getContext(): AppContext {
       return context;
+    },
+
+    setScene(newScene: VisualScene, p?: p5): void {
+      context.scene = newScene;
+      texManager.setScene(newScene, p);
     },
   };
 };

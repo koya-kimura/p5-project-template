@@ -3,12 +3,13 @@ import { UniformRandom } from "../utils/math/UniformRandom";
 import type { APCMiniMK2Manager } from "../midi/apcmini_mk2/APCMiniMK2Manager";
 import type { AudioMicManager } from "../audio/AudioMicManager";
 import type { CaptureManager } from "../capture/CaptureManager";
+import type { VisualScene } from "./types";
 
 /**
  * PlaceholderScene はテンプレートの初期表示用シンプルなシーンです。
  * MIDI フェーダーとビート値を受け取り、パラメータに反応した図形を描画します。
  */
-export class PlaceholderScene {
+export class PlaceholderScene implements VisualScene {
   private rotation = 0;
   private hue = 0;
 

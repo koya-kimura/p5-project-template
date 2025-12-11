@@ -3,13 +3,13 @@ import p5 from "p5";
 
 import { createAppRuntime } from "./core/appRuntime";
 
-const runtime = createAppRuntime({
-  enableAudio: true,
-  enableCapture: true,
-});
-
 // sketch は p5 インスタンスモードで実行されるエントリー関数。
 const sketch = (p: p5) => {
+  const runtime = createAppRuntime({
+    enableAudio: true,
+    enableCapture: true,
+  });
+
   // setup は一度だけ呼ばれ、レンダーターゲットとシェーダーを初期化する。
   p.setup = async () => {
     p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);

@@ -1,9 +1,12 @@
+import type { VisualScene } from "../scenes/types";
+
 /**
  * ランタイム起動時に有効化する機能フラグをまとめた設定。
  */
 export interface AppConfig {
   enableAudio: boolean;
   enableCapture: boolean;
+  createScene?: () => VisualScene;
 }
 
 /**
