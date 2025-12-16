@@ -27,8 +27,7 @@ dist-ssr
 .github
 
 # 個人用メモとTODOファイル
-memo.md
-TODO.md
+docs/improve.md
 
 # シェーダービルド生成物
 public/shader/dist/

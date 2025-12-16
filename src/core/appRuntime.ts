@@ -153,15 +153,14 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
         return; // 初期化完了前に描画しない
       }
 
-      // p.background(0); // 背景を黒でクリア（エフェクト適用前にクリア不要）
+      const beat = bpmManager.getBeat();
+      const visualFont = context.assets.font;
 
       // 各マネージャーの更新
       bpmManager.update();
       audioManager?.update();
       captureManager?.update(p);
-
-      const beat = bpmManager.getBeat();
-      const visualFont = context.assets.font;
+      midiManager.update(beat);
 
       // ビジュアルの更新と描画
       visualComposer.update(p, midiManager, beat, audioManager, captureManager, visualFont);
