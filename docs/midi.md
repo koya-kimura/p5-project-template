@@ -15,6 +15,7 @@
 - `key`: ボタンの識別子（ユニークな文字列）
 - `type`: ボタンの動作タイプ
 - `cells`: ボタンの位置（ページ、行、列）
+- `cells[].keyboardKey`: MIDI未接続時に代替入力として使うキー（任意）
 - `activeColor`: アクティブ時の LED 色
 - `inactiveColor`: 非アクティブ時の LED 色
 - その他のタイプ固有のプロパティ
@@ -29,8 +30,8 @@
   key: "sceneSelect",
   type: "radio",
   cells: [
-    { page: 0, row: 0, col: 0 },
-    { page: 0, row: 1, col: 0 },
+    { page: 0, row: 0, col: 0, keyboardKey: "1" },
+    { page: 0, row: 1, col: 0, keyboardKey: "2" },
     // ...
   ],
   activeColor: LED_PALETTE.RED,
@@ -144,4 +145,28 @@ MIDI 接続なしで使用する場合の初期値を設定します。
 ## 使用例
 
 実際の設定例は `config.ts` を参照してください。必要に応じてボタンを追加・削除し、プロジェクトに合わせてカスタマイズしてください。
+
+## キーボード代替入力
+
+MIDI未接続時に、`cells[].keyboardKey` が設定されたセルをキーボードで押下できます。
+
+`config.ts` の `KEYBOARD_FALLBACK_CONFIG` で有効条件を制御します。
+
+```typescript
+export const KEYBOARD_FALLBACK_CONFIG = {
+  enabledWhenMidiUnavailable: true,
+  allowWhenMidiAvailable: false,
+};
+```
+
+- `enabledWhenMidiUnavailable`: MIDI未接続時にキーボード代替を有効化
+- `allowWhenMidiAvailable`: MIDI接続中にもキーボード代替を許可するか
+
+### よくある質問
+
+#### keyboardKey が未設定でも動きますか？
+
+- はい。MIDI 入力としては通常どおり動作します。
+- ただしキーボード代替入力は、`keyboardKey` を設定したセルだけが対象です。
+- つまり `keyboardKey` 未設定セルは「MIDIでは動く / キーボードでは動かない」という挙動になります。
 ```

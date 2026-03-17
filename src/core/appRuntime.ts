@@ -4,6 +4,7 @@ import { EffectManager } from "../manager/effectManager"; // シェーダーエ�
 import { UIManager } from "../manager/uiManager"; // UIオーバーレイを描画するマネージャー
 import { BPMManager } from "../utils/rhythm/bpmManager"; // BPMとビートを管理するユーティリティ
 import { APCMiniMK2Manager } from "../midi/apcmini_mk2/apcMiniMk2Manager"; // MIDIコントローラー（APC Mini MK2）の管理
+import { KEYBOARD_FALLBACK_CONFIG } from "../midi/apcmini_mk2/config";
 import { AudioMicManager } from "../utils/audio/audioMicManager"; // オーディオ入力（マイク）を管理
 import { CaptureManager } from "../utils/capture/captureManager"; // カメラキャプチャを管理
 import type { AppConfig } from "./appConfig"; // 設定インターフェース
@@ -210,6 +211,24 @@ export const createAppRuntime = (config?: Partial<AppConfig>): AppRuntime => {
       if (p.keyCode === 32) {
         p.fullscreen(true); // スペースキーでフルスクリーン
       }
+
+      if (p.keyCode === p.ENTER || p.key === "Enter") {
+        bpmManager.tapTempo();
+      }
+
+      if (p.keyCode === p.SHIFT || p.key === "Shift") {
+        bpmManager.resetBeat();
+      }
+
+      const midiAvailable = midiManager.isMidiAvailable();
+      const keyboardFallbackEnabled =
+        (midiAvailable && KEYBOARD_FALLBACK_CONFIG.allowWhenMidiAvailable) ||
+        (!midiAvailable && KEYBOARD_FALLBACK_CONFIG.enabledWhenMidiUnavailable);
+
+      if (keyboardFallbackEnabled) {
+        midiManager.applyKeyboardFallback(p.key);
+      }
+
       // オーディオコンテキストを再開（ユーザー操作が必要）
       audioManager?.resume().catch(() => undefined);
     },

@@ -154,6 +154,15 @@ export class BPMManager {
   }
 
   /**
+   * ビート位置を先頭へ戻す。
+   */
+  public resetBeat(): void {
+    this.beatCount = 0;
+    this.elapsed = 0;
+    this.lastUpdateTime = performance.now();
+  }
+
+  /**
    * スピード倍率を直接設定します。
    * 0以下の値は無視されます。
    *

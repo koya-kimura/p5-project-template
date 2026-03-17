@@ -2,7 +2,7 @@
  * MIDI設定ファイル
  * APC Mini MK2のボタン・セルの設定を定義します。
  */
-import type { ButtonConfig, FaderButtonMode } from "../../types";
+import type { ButtonConfig, FaderButtonMode, KeyboardFallbackConfig } from "../../types";
 import { LED_PALETTE } from "./ledPalette";
 
 // ========================================
@@ -15,6 +15,15 @@ import { LED_PALETTE } from "./ledPalette";
  */
 export const MIDI_BUTTON_CONFIGS: ButtonConfig[] = [
 ];
+
+/**
+ * MIDI未接続時のキーボード代替入力設定。
+ * セルごとの `keyboardKey` が設定されている場合のみ有効です。
+ */
+export const KEYBOARD_FALLBACK_CONFIG: KeyboardFallbackConfig = {
+  enabledWhenMidiUnavailable: true,
+  allowWhenMidiAvailable: false,
+};
 
 // ========================================
 // フェーダーボタンモード設定

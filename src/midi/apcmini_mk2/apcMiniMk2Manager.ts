@@ -187,6 +187,41 @@ export class APCMiniMK2Manager extends MIDIManager {
     }
   }
 
+  /**
+   * 入力値を外部から上書きする。
+   */
+  public setButtonValue(key: string, value: MidiInputValue): void {
+    if (this.inputValues.has(key)) {
+      this.inputValues.set(key, value);
+    }
+  }
+
+  /**
+   * キーボード入力をセル定義の `keyboardKey` と照合して仮想押下を適用する。
+   *
+   * @returns 1件以上適用されたら true。
+   */
+  public applyKeyboardFallback(keyInput: string): boolean {
+    const normalized = this.normalizeKeyboardKey(keyInput);
+    if (!normalized) {
+      return false;
+    }
+
+    let applied = false;
+    for (const [buttonKey, config] of this.buttonConfigs) {
+      for (let cellIndex = 0; cellIndex < config.cells.length; cellIndex++) {
+        const cell = config.cells[cellIndex];
+        if (this.normalizeKeyboardKey(cell.keyboardKey) !== normalized) {
+          continue;
+        }
+        this.applyVirtualCellPress(buttonKey, config, cellIndex);
+        applied = true;
+      }
+    }
+
+    return applied;
+  }
+
   // ========================================
   // 公開API: 入力値取得
   // ========================================
@@ -677,6 +712,60 @@ export class APCMiniMK2Manager extends MIDIManager {
    */
   private getCellKey(page: number, row: number, col: number): string {
     return `${page}-${row}-${col}`;
+  }
+
+  /**
+   * キー入力を比較しやすい形へ正規化する。
+   */
+  private normalizeKeyboardKey(key: string | undefined): string {
+    if (typeof key !== "string") {
+      return "";
+    }
+    return key.trim().toLowerCase();
+  }
+
+  /**
+   * キーボード入力でセルが押されたとみなして値を更新する。
+   */
+  private applyVirtualCellPress(buttonKey: string, config: ButtonConfig, cellIndex: number): void {
+    switch (config.type) {
+      case "radio":
+        if (!this.isRadioBlockedByRandom(buttonKey)) {
+          this.inputValues.set(buttonKey, cellIndex);
+        }
+        break;
+      case "toggle": {
+        const currentToggle = this.inputValues.get(buttonKey) as boolean;
+        this.inputValues.set(buttonKey, !currentToggle);
+        break;
+      }
+      case "oneshot":
+        this.inputValues.set(buttonKey, true);
+        break;
+      case "momentary":
+        this.inputValues.set(buttonKey, true);
+        this.momentaryState.set(buttonKey, true);
+        setTimeout(() => {
+          this.inputValues.set(buttonKey, false);
+          this.momentaryState.set(buttonKey, false);
+        }, 0);
+        break;
+      case "random": {
+        const currentRandom = this.inputValues.get(buttonKey) as boolean;
+        this.inputValues.set(buttonKey, !currentRandom);
+        if (currentRandom) {
+          this.lastRandomBeat.set(buttonKey, -1);
+        }
+        break;
+      }
+      case "sequence": {
+        const pattern = this.sequencePatterns.get(buttonKey);
+        if (pattern && cellIndex < pattern.length) {
+          pattern[cellIndex] = !pattern[cellIndex];
+        }
+        break;
+      }
+    }
   }
 
   /**

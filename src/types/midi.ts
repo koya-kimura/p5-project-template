@@ -15,6 +15,15 @@ export interface CellPosition {
   page?: number; // デフォルト: 0
   row: number; // 0=上, 7=下
   col: number; // 0=左, 7=右
+  keyboardKey?: string; // 例: "1", "q", "a"
+}
+
+/**
+ * MIDI未接続時のキーボード代替入力設定。
+ */
+export interface KeyboardFallbackConfig {
+  enabledWhenMidiUnavailable: boolean;
+  allowWhenMidiAvailable: boolean;
 }
 
 /**
